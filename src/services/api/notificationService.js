@@ -1,5 +1,5 @@
-import notifications from '../mockData/notifications.json'
-import userService from './userService.js'
+import notifications from "../mockData/notifications.json";
+import userService from "./userService.js";
 
 // Notification Service Class
 
@@ -225,11 +225,28 @@ class NotificationService {
       return content.substring(0, 100) + '...';
     }
     
-    return content || null;
+return content || null;
+  }
+
+  // Real-time notification simulation
+  simulateRealTimeNotification(targetUserId = 1) {
+    const types = ['like', 'comment', 'follow', 'mention'];
+    const actors = [2, 3, 4, 5]; // Sample actor IDs
+    
+    const notification = {
+      type: types[Math.floor(Math.random() * types.length)],
+      actorId: actors[Math.floor(Math.random() * actors.length)],
+      targetId: targetUserId,
+      targetType: 'post',
+      content: 'Sample notification content for real-time demo',
+      postId: Math.floor(Math.random() * 10) + 1,
+      read: false
+    };
+
+    return this.create(notification);
   }
 }
 // Create instance and export
 const notificationService = new NotificationService();
 
 export default notificationService;
-export { notificationService };
