@@ -4,6 +4,7 @@ import userService from "./userService.js";
 class PostService {
   constructor() {
     this.posts = [...posts];
+    this.comments = []; // Track comments count for posts
     this.nextId = Math.max(...posts.map(p => p.Id)) + 1;
   }
 
@@ -70,7 +71,31 @@ class PostService {
       this.posts.splice(postIndex, 1);
       return true;
     }
-    throw new Error("Post not found");
+throw new Error("Post not found");
+  }
+
+async addComment(postId) {
+    await this.delay();
+    
+    const post = this.posts.find(p => p.Id === parseInt(postId));
+    if (!post) {
+      throw new Error("Post not found");
+    }
+
+    post.comments = (post.comments || 0) + 1;
+    return { ...post };
+  }
+
+async removeComment(postId) {
+    await this.delay();
+    
+    const post = this.posts.find(p => p.Id === parseInt(postId));
+    if (!post) {
+      throw new Error("Post not found");
+    }
+
+    post.comments = Math.max((post.comments || 0) - 1, 0);
+    return { ...post };
   }
 }
 

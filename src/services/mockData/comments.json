@@ -1,0 +1,86 @@
+[
+  {
+    "Id": 1,
+    "postId": 1,
+    "authorId": 2,
+    "content": "This looks amazing! The color palette is so clean and modern. Can't wait to see the final product in action! 🎨",
+    "timestamp": "2024-01-20T15:00:00Z"
+  },
+  {
+    "Id": 2,
+    "postId": 1,
+    "authorId": 3,
+    "content": "Love the attention to detail in the typography. What font family did you choose for the headers?",
+    "timestamp": "2024-01-20T15:15:00Z"
+  },
+  {
+    "Id": 3,
+    "postId": 1,
+    "authorId": 4,
+    "content": "The user flow feels so intuitive! Great work on the information architecture.",
+    "timestamp": "2024-01-20T16:30:00Z"
+  },
+  {
+    "Id": 4,
+    "postId": 2,
+    "authorId": 1,
+    "content": "Absolutely stunning capture! The lighting is perfect. What camera settings did you use?",
+    "timestamp": "2024-01-20T07:20:00Z"
+  },
+  {
+    "Id": 5,
+    "postId": 2,
+    "authorId": 3,
+    "content": "This makes me want to book a flight to Bali right now! 🌴 Your photography always inspires wanderlust.",
+    "timestamp": "2024-01-20T08:45:00Z"
+  },
+  {
+    "Id": 6,
+    "postId": 2,
+    "authorId": 5,
+    "content": "The composition is masterful. You've really captured the essence of that golden hour magic.",
+    "timestamp": "2024-01-20T09:10:00Z"
+  },
+  {
+    "Id": 7,
+    "postId": 3,
+    "authorId": 1,
+    "content": "This is exactly what the React community needs! Clean, reusable components are a game-changer. 🚀",
+    "timestamp": "2024-01-19T23:00:00Z"
+  },
+  {
+    "Id": 8,
+    "postId": 3,
+    "authorId": 2,
+    "content": "Would love to contribute to this! Is it open source? The documentation looks really comprehensive.",
+    "timestamp": "2024-01-20T10:30:00Z"
+  },
+  {
+    "Id": 9,
+    "postId": 4,
+    "authorId": 2,
+    "content": "So inspiring! I needed this motivation today. What's your current workout routine looking like?",
+    "timestamp": "2024-01-19T08:30:00Z"
+  },
+  {
+    "Id": 10,
+    "postId": 4,
+    "authorId": 5,
+    "content": "Consistency is key! I've been following your fitness journey and it's been amazing to watch. Keep it up! 💪",
+    "timestamp": "2024-01-19T09:15:00Z"
+  },
+  {
+    "Id": 11,
+    "postId": 5,
+    "authorId": 3,
+    "content": "The startup ecosystem is thriving! What's the most exciting trend you're seeing in tech right now?",
+    "timestamp": "2024-01-19T17:00:00Z"
+  },
+  {
+    "Id": 12,
+    "postId": 5,
+    "authorId": 4,
+    "content": "Innovation at its finest! These entrepreneurs are going to change the world. 🌟",
+    "timestamp": "2024-01-19T18:45:00Z"
+  }
+]
