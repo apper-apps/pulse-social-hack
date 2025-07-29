@@ -1,14 +1,39 @@
-import React from "react";
-import { cn } from "@/utils/cn";
-import NavItem from "@/components/molecules/NavItem";
+import React, { useEffect, useState } from "react";
 import ApperIcon from "@/components/ApperIcon";
+import NavItem from "@/components/molecules/NavItem";
+import { cn } from "@/utils/cn";
+import { notificationService } from "@/services/notificationService";
 
 const Sidebar = ({ isOpen, onClose, className }) => {
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    const loadUnreadCount = async () => {
+      try {
+        const count = await notificationService.getUnreadCount(1); // Current user ID
+        setUnreadCount(count);
+      } catch (err) {
+        console.error('Failed to load unread notification count:', err);
+      }
+    };
+
+    loadUnreadCount();
+    
+    // Poll for updates every 30 seconds
+    const interval = setInterval(loadUnreadCount, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
   const navItems = [
     { to: "/", icon: "Home", label: "Home" },
     { to: "/explore", icon: "Compass", label: "Explore" },
     { to: "/messages", icon: "MessageSquare", label: "Messages", badge: "3" },
-    { to: "/notifications", icon: "Bell", label: "Notifications", badge: "12" },
+    { 
+      to: "/notifications", 
+      icon: "Bell", 
+      label: "Notifications", 
+      badge: unreadCount > 0 ? unreadCount.toString() : null 
+    },
     { to: "/profile/1", icon: "User", label: "Profile" }
   ];
 
