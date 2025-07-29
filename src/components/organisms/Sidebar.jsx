@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import ApperIcon from "@/components/ApperIcon";
 import NavItem from "@/components/molecules/NavItem";
 import { cn } from "@/utils/cn";
-import { notificationService } from "@/services/notificationService";
+import { notificationService } from "@/services/api/notificationService";
 
 const Sidebar = ({ isOpen, onClose, className }) => {
   const [unreadCount, setUnreadCount] = useState(0);
