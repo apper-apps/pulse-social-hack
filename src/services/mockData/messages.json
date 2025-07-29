@@ -1,0 +1,128 @@
+[
+  {
+    "Id": 1,
+    "conversationId": 1,
+    "senderId": 2,
+    "content": "Hey Alex! I saw your latest UI design on Instagram. It's absolutely beautiful! 😍",
+    "timestamp": "2024-01-15T14:25:00Z",
+    "type": "text",
+    "readBy": [2]
+  },
+  {
+    "Id": 2,
+    "conversationId": 1,
+    "senderId": 2,
+    "content": "Hey! How's your new design project coming along?",
+    "timestamp": "2024-01-15T14:30:00Z",
+    "type": "text",
+    "readBy": [2]
+  },
+  {
+    "Id": 3,
+    "conversationId": 1,
+    "senderId": 1,
+    "content": "Thanks Sarah! It's been challenging but really exciting. Working on a complete redesign for a fintech app.",
+    "timestamp": "2024-01-15T14:32:00Z",
+    "type": "text",
+    "readBy": [1, 2]
+  },
+  {
+    "Id": 4,
+    "conversationId": 1,
+    "senderId": 1,
+    "content": "The client wants something modern but trustworthy. Finding that balance is tricky!",
+    "timestamp": "2024-01-15T14:33:00Z",
+    "type": "text",
+    "readBy": [1, 2]
+  },
+  {
+    "Id": 5,
+    "conversationId": 2,
+    "senderId": 1,
+    "content": "Hey Mike! Could you take a look at my React component when you have a moment?",
+    "timestamp": "2024-01-15T12:40:00Z",
+    "type": "text",
+    "readBy": [1, 3]
+  },
+  {
+    "Id": 6,
+    "conversationId": 2,
+    "senderId": 3,
+    "content": "Thanks for the code review! I'll push the fixes shortly.",
+    "timestamp": "2024-01-15T12:45:00Z",
+    "type": "text",
+    "readBy": [1, 3]
+  },
+  {
+    "Id": 7,
+    "conversationId": 2,
+    "senderId": 1,
+    "content": "Perfect! The component structure looks much cleaner now. Great job on the optimization!",
+    "timestamp": "2024-01-15T12:50:00Z",
+    "type": "text",
+    "readBy": [1, 3]
+  },
+  {
+    "Id": 8,
+    "conversationId": 3,
+    "senderId": 4,
+    "content": "The workout plan you shared is amazing! Already feeling stronger 💪",
+    "timestamp": "2024-01-15T10:15:00Z",
+    "type": "text",
+    "readBy": [4]
+  },
+  {
+    "Id": 9,
+    "conversationId": 3,
+    "senderId": 1,
+    "content": "That's awesome Emily! Consistency is key. How are you finding the morning routine?",
+    "timestamp": "2024-01-15T10:20:00Z",
+    "type": "text",
+    "readBy": [1, 4]
+  },
+  {
+    "Id": 10,
+    "conversationId": 4,
+    "senderId": 5,
+    "content": "Let's schedule that investor meeting for next week",
+    "timestamp": "2024-01-14T18:20:00Z",
+    "type": "text",
+    "readBy": [1, 5]
+  },
+  {
+    "Id": 11,
+    "conversationId": 4,
+    "senderId": 1,
+    "content": "Sounds great David! I'm free Tuesday through Thursday afternoons. What works best for you?",
+    "timestamp": "2024-01-14T18:25:00Z",
+    "type": "text",
+    "readBy": [1, 5]
+  },
+  {
+    "Id": 12,
+    "conversationId": 5,
+    "senderId": 3,
+    "content": "Your travel photos from Thailand are incredible! 📸",
+    "timestamp": "2024-01-14T16:45:00Z",
+    "type": "text",
+    "readBy": [3]
+  },
+  {
+    "Id": 13,
+    "conversationId": 5,
+    "senderId": 3,
+    "content": "That sunset shot from Phi Phi Islands is pure magic ✨",
+    "timestamp": "2024-01-14T16:46:00Z",
+    "type": "text",
+    "readBy": [3]
+  },
+  {
+    "Id": 14,
+    "conversationId": 5,
+    "senderId": 3,
+    "content": "What camera are you using? The colors are so vibrant!",
+    "timestamp": "2024-01-14T16:47:00Z",
+    "type": "text",
+    "readBy": [3]
+  }
+]

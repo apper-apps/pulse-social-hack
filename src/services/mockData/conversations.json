@@ -1,0 +1,74 @@
+[
+  {
+    "Id": 1,
+    "participants": [1, 2],
+    "lastMessage": "Hey! How's your new design project coming along?",
+    "lastMessageTime": "2024-01-15T14:30:00Z",
+    "unreadCount": 2,
+    "createdAt": "2024-01-10T09:00:00Z"
+  },
+  {
+    "Id": 2,
+    "participants": [1, 3],
+    "lastMessage": "Thanks for the code review! I'll push the fixes shortly.",
+    "lastMessageTime": "2024-01-15T12:45:00Z",
+    "unreadCount": 0,
+    "createdAt": "2024-01-12T11:30:00Z"
+  },
+  {
+    "Id": 3,
+    "participants": [1, 4],
+    "lastMessage": "The workout plan you shared is amazing! Already feeling stronger 💪",
+    "lastMessageTime": "2024-01-15T10:15:00Z",
+    "unreadCount": 1,
+    "createdAt": "2024-01-14T16:20:00Z"
+  },
+  {
+    "Id": 4,
+    "participants": [1, 5],
+    "lastMessage": "Let's schedule that investor meeting for next week",
+    "lastMessageTime": "2024-01-14T18:20:00Z",
+    "unreadCount": 0,
+    "createdAt": "2024-01-08T14:15:00Z"
+  },
+  {
+    "Id": 5,
+    "participants": [2, 3],
+    "lastMessage": "Your travel photos from Thailand are incredible! 📸",
+    "lastMessageTime": "2024-01-14T16:45:00Z",
+    "unreadCount": 3,
+    "createdAt": "2024-01-11T13:30:00Z"
+  },
+  {
+    "Id": 6,
+    "participants": [2, 4],
+    "lastMessage": "Would love to collaborate on that fitness photography project",
+    "lastMessageTime": "2024-01-13T15:30:00Z",
+    "unreadCount": 0,
+    "createdAt": "2024-01-13T15:00:00Z"
+  },
+  {
+    "Id": 7,
+    "participants": [3, 4],
+    "lastMessage": "The new restaurant you recommended was fantastic!",
+    "lastMessageTime": "2024-01-13T20:15:00Z",
+    "unreadCount": 1,
+    "createdAt": "2024-01-13T19:45:00Z"
+  },
+  {
+    "Id": 8,
+    "participants": [3, 5],
+    "lastMessage": "Interested in discussing the tech startup opportunity",
+    "lastMessageTime": "2024-01-12T14:30:00Z",
+    "unreadCount": 0,
+    "createdAt": "2024-01-12T14:00:00Z"
+  },
+  {
+    "Id": 9,
+    "participants": [4, 5],
+    "lastMessage": "The wellness workshop was incredibly insightful",
+    "lastMessageTime": "2024-01-11T11:20:00Z",
+    "unreadCount": 2,
+    "createdAt": "2024-01-11T10:45:00Z"
+  }
+]
