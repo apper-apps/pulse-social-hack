@@ -132,9 +132,9 @@ const ProfileHeader = ({ user, isCurrentUser = false, onEdit, onFollowChange }) 
           <div className="flex items-center space-x-2">
             <ApperIcon name="FileText" className="w-4 h-4 text-gray-500" />
             <span className="font-semibold text-gray-900">{user.postsCount}</span>
-            <span className="text-gray-600">Posts</span>
+<span className="text-gray-600">Posts</span>
           </div>
-<button 
+          <button 
             onClick={() => openFollowModal("followers")}
             className="flex items-center space-x-2 hover:bg-gray-100 rounded-lg p-2 transition-colors"
           >
@@ -142,7 +142,7 @@ const ProfileHeader = ({ user, isCurrentUser = false, onEdit, onFollowChange }) 
             <span className="font-semibold text-gray-900">{user.followersCount}</span>
             <span className="text-gray-600">Followers</span>
           </button>
-          <button 
+          <button
             onClick={() => openFollowModal("following")}
             className="flex items-center space-x-2 hover:bg-gray-100 rounded-lg p-2 transition-colors"
           >
@@ -162,6 +162,7 @@ const ProfileHeader = ({ user, isCurrentUser = false, onEdit, onFollowChange }) 
         title={modalTitle}
       />
     </motion.div>
-  );
+);
+};
 
 export default ProfileHeader;
