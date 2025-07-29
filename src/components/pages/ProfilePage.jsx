@@ -19,25 +19,27 @@ const { userId } = useParams();
   useEffect(() => {
 loadProfileData();
   }, [userId, refreshKey]);
-  const loadProfileData = async () => {
-try {
+const loadProfileData = async () => {
+    try {
       setLoading(true);
       setError("");
       
       // Ensure userId is a valid primitive value
-      if (!userId || (typeof userId === 'object' && !userId.Id && !userId.id)) {
+      const idValue = typeof userId === 'object' && userId !== null ? (userId.Id || userId.id) : userId;
+      if (!idValue) {
         setError("Invalid user ID");
         setLoading(false);
         return;
       }
+      
       const [userData, userPosts, currentUserData] = await Promise.all([
-        userService.getById(userId),
-        postService.getByUserId(userId),
+        userService.getById(idValue),
+        postService.getByUserId(idValue),
         userService.getCurrentUser()
       ]);
       
       // Get updated user data with current follow counts
-      const updatedUserData = await userService.getById(userId);
+      const updatedUserData = await userService.getById(idValue);
       
       setUser(updatedUserData);
       setPosts(userPosts);
