@@ -1,15 +1,19 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import SuggestedUsers from "@/components/organisms/SuggestedUsers";
+import userService from "@/services/api/userService";
+import postService from "@/services/api/postService";
+import ApperIcon from "@/components/ApperIcon";
 import PostCard from "@/components/organisms/PostCard";
 import Loading from "@/components/ui/Loading";
 import Error from "@/components/ui/Error";
 import Empty from "@/components/ui/Empty";
-import ApperIcon from "@/components/ApperIcon";
-import postService from "@/services/api/postService";
+import Button from "@/components/atoms/Button";
+import Avatar from "@/components/atoms/Avatar";
 
 const ExplorePage = () => {
   const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -22,11 +26,9 @@ const ExplorePage = () => {
       setLoading(true);
       setError("");
       
-      // Get all posts and shuffle them for explore feed
-      const allPosts = await postService.getAll(1, 20);
-      const shuffledPosts = [...allPosts].sort(() => Math.random() - 0.5);
-      setPosts(shuffledPosts);
-      
+// Get trending posts sorted by engagement metrics
+const trendingPosts = await postService.getTrendingPosts();
+setPosts(trendingPosts);
     } catch (err) {
       console.error("Failed to load explore posts:", err);
       setError("Failed to load posts. Please try again.");
@@ -88,56 +90,102 @@ const ExplorePage = () => {
           </div>
         </motion.div>
       </div>
+{/* Three-column discovery layout */}
+<div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+  {/* Main content - Trending Posts */}
+  <div className="lg:col-span-3">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, delay: 0.1 }}
+      className="mb-6"
+    >
+      <h2 className="text-xl font-bold text-gray-900 mb-2">Trending Posts</h2>
+      <p className="text-gray-600 text-sm">Popular posts from across the platform</p>
+    </motion.div>
 
-      {/* Trending Topics */}
+    {filteredPosts.length === 0 ? (
+      <Empty
+        title={searchQuery ? "No posts found" : "No trending posts"}
+        message={searchQuery ? "Try adjusting your search terms" : "Check back later for trending content"}
+        icon="TrendingUp"
+      />
+    ) : (
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.1 }}
-        className="mb-8"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3, delay: 0.2 }}
+        className="space-y-6"
       >
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Trending Topics</h2>
-        <div className="flex flex-wrap gap-3">
-          {["#design", "#travel", "#technology", "#fitness", "#startup"].map((tag) => (
-            <span
-              key={tag}
-              className="px-4 py-2 bg-gradient-to-r from-primary-50 to-primary-100 text-primary-700 rounded-full text-sm font-medium hover:from-primary-100 hover:to-primary-200 transition-all duration-200 cursor-pointer"
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
+        {filteredPosts.map((post, index) => (
+          <motion.div
+            key={post.Id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: index * 0.1 }}
+          >
+            <PostCard
+              post={post}
+              onLike={handlePostLike}
+            />
+          </motion.div>
+        ))}
       </motion.div>
+    )}
+  </div>
 
-      {/* Posts */}
-      {filteredPosts.length === 0 ? (
-        <Empty
-          title={searchQuery ? "No posts found" : "No posts to explore"}
-          message={searchQuery ? "Try adjusting your search terms" : "Check back later for new content to discover"}
-          icon="Search"
-        />
-      ) : (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.3, delay: 0.2 }}
-          className="space-y-6"
-        >
-          {filteredPosts.map((post, index) => (
-            <motion.div
-              key={post.Id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: index * 0.1 }}
-            >
-              <PostCard
-                post={post}
-                onLike={handlePostLike}
-              />
-            </motion.div>
-          ))}
-        </motion.div>
-      )}
+  {/* Sidebar */}
+  <div className="lg:col-span-1 space-y-6">
+    {/* Trending Hashtags */}
+    <motion.div
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.3, delay: 0.3 }}
+      className="card p-6"
+    >
+      <div className="flex items-center gap-2 mb-4">
+        <ApperIcon name="Hash" className="w-5 h-5 text-primary-600" />
+        <h3 className="font-semibold text-gray-900">Trending Topics</h3>
+      </div>
+      <div className="space-y-3">
+        {[
+          { tag: "#design", posts: "2.4k posts" },
+          { tag: "#travel", posts: "1.8k posts" },
+          { tag: "#technology", posts: "3.1k posts" },
+          { tag: "#fitness", posts: "1.2k posts" },
+          { tag: "#startup", posts: "892 posts" }
+        ].map((item, index) => (
+          <div
+            key={item.tag}
+            className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors duration-200"
+          >
+            <div>
+              <p className="font-medium text-primary-700">{item.tag}</p>
+              <p className="text-sm text-gray-500">{item.posts}</p>
+            </div>
+            <ApperIcon name="TrendingUp" className="w-4 h-4 text-green-500" />
+          </div>
+        ))}
+      </div>
+    </motion.div>
+
+    {/* Suggested Users */}
+    <motion.div
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.3, delay: 0.4 }}
+      className="card p-6"
+    >
+      <div className="flex items-center gap-2 mb-4">
+        <ApperIcon name="UserPlus" className="w-5 h-5 text-primary-600" />
+        <h3 className="font-semibold text-gray-900">Suggested for you</h3>
+      </div>
+      <div className="space-y-4">
+        <SuggestedUsers />
+      </div>
+    </motion.div>
+  </div>
+</div>
     </div>
   );
 };

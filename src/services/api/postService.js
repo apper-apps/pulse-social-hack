@@ -57,9 +57,23 @@ return new Promise(resolve => setTimeout(resolve, Math.random() * 400 + 200));
   }
 
 async getById(id) {
-    await this.delay();
-    return this.posts.find(post => post.Id === parseInt(id));
-  }
+  await this.delay();
+  return this.posts.find(post => post.Id === parseInt(id));
+}
+
+async getTrendingPosts(limit = 20) {
+  await this.delay();
+  // Sort posts by engagement score (likes + comments)
+  const sortedPosts = [...this.posts]
+    .map(post => ({
+      ...post,
+      engagementScore: post.likes + post.comments
+    }))
+    .sort((a, b) => b.engagementScore - a.engagementScore)
+    .slice(0, limit);
+  
+  return sortedPosts;
+}
 
   async getByUserId(userId, page = 1, limit = 12) {
     await this.delay();
