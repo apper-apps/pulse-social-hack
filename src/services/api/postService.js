@@ -520,4 +520,3 @@ class PostService {
 const postService = new PostService();
 
 export default postService;
-export default new PostService();

@@ -250,4 +250,3 @@ class MessageService {
 const messageService = new MessageService();
 
 export default messageService;
-export default messageService;

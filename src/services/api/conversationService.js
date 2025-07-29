@@ -287,4 +287,3 @@ class ConversationService {
 const conversationService = new ConversationService();
 
 export default conversationService;
-export default conversationService;
