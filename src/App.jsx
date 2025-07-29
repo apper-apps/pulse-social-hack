@@ -1,25 +1,24 @@
-import { createContext, useEffect, useState } from 'react';
-import { Routes, Route, useNavigate } from 'react-router-dom';
-import { Provider } from 'react-redux';
-import { BrowserRouter } from 'react-router-dom';
-import { ToastContainer } from 'react-toastify';
-import { useDispatch, useSelector } from 'react-redux';
-import { setUser, clearUser } from '@/store/userSlice';
-import { store } from '@/store';
-import { NotificationProvider } from "@/contexts/NotificationContext";
-import Layout from "@/components/pages/Layout";
-import HomeFeed from "@/components/pages/HomeFeed";
+import React, { createContext, useEffect, useState } from "react";
+import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom";
+import { Provider, useDispatch, useSelector } from "react-redux";
+import { ToastContainer } from "react-toastify";
+import "@/index.css";
 import ExplorePage from "@/components/pages/ExplorePage";
+import Login from "@/components/pages/Login";
+import PromptPassword from "@/components/pages/PromptPassword";
+import ResetPassword from "@/components/pages/ResetPassword";
 import ProfilePage from "@/components/pages/ProfilePage";
-import PostDetailPage from "@/components/pages/PostDetailPage";
-import MessagesPage from "@/components/pages/MessagesPage";
+import HomeFeed from "@/components/pages/HomeFeed";
+import Callback from "@/components/pages/Callback";
 import NotificationsPage from "@/components/pages/NotificationsPage";
-import Login from '@/components/pages/Login';
-import Signup from '@/components/pages/Signup';
-import Callback from '@/components/pages/Callback';
-import ErrorPage from '@/components/pages/ErrorPage';
-import ResetPassword from '@/components/pages/ResetPassword';
-import PromptPassword from '@/components/pages/PromptPassword';
+import ErrorPage from "@/components/pages/ErrorPage";
+import Signup from "@/components/pages/Signup";
+import MessagesPage from "@/components/pages/MessagesPage";
+import PostDetailPage from "@/components/pages/PostDetailPage";
+import Layout from "@/components/pages/Layout";
+import { clearUser, setUser } from "@/store/userSlice";
+import { store } from "@/store/index";
+import { NotificationProvider } from "@/contexts/NotificationContext";
 
 // Create auth context
 export const AuthContext = createContext(null);
@@ -100,9 +99,10 @@ function AppContent() {
       },
       onError: function(error) {
         console.error("Authentication failed:", error);
+        setIsInitialized(true);
       }
     });
-  }, []);// No props and state should be bound
+  }, [navigate, dispatch]);
   
   // Authentication methods to share via context
   const authMethods = {

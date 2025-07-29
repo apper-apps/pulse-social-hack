@@ -1,4 +1,4 @@
-import userService from './userService.js';
+import userService from "@/services/api/userService";
 
 class NotificationService {
   constructor() {
@@ -44,10 +44,10 @@ class NotificationService {
 
       return response.data || [];
     } catch (error) {
-      if (error?.response?.data?.message) {
+if (error?.response?.data?.message) {
         console.error("Error fetching notifications:", error?.response?.data?.message);
       } else {
-        console.error(error.message);
+        console.error("Error fetching notifications:", error.message);
       }
       return [];
     }
@@ -85,8 +85,8 @@ class NotificationService {
     } catch (error) {
       if (error?.response?.data?.message) {
         console.error(`Error fetching notification with ID ${id}:`, error?.response?.data?.message);
-      } else {
-        console.error(error.message);
+} else {
+        console.error("Error fetching notification by ID:", error.message);
       }
       return null;
     }
@@ -148,14 +148,15 @@ class NotificationService {
 
       return response.data || [];
     } catch (error) {
-      if (error?.response?.data?.message) {
+if (error?.response?.data?.message) {
         console.error("Error fetching user notifications:", error?.response?.data?.message);
       } else {
-        console.error(error.message);
+        console.error("Error fetching user notifications:", error.message);
       }
       return [];
     }
   }
+
 
   async getGroupedNotifications(userId) {
     try {
@@ -200,10 +201,12 @@ userNotifications.map(async (notification) => {
 
       return grouped;
     } catch (error) {
-      console.error("Error fetching grouped notifications:", error);
+console.error("Error fetching grouped notifications:", error);
       return { likes: [], comments: [], follows: [], mentions: [], messages: [] };
     }
   }
+
+
 
   async markAsRead(id) {
     try {
@@ -333,13 +336,18 @@ userNotifications.map(async (notification) => {
         console.error("Error marking all notifications as read:", error?.response?.data?.message);
       } else {
         console.error(error.message);
-      }
+}
       return { success: false, count: 0 };
     }
   }
 
-  async markSelectedAsRead(notificationIds) {
+
+async markSelectedAsRead(notificationIds) {
     try {
+      if (!notificationIds || notificationIds.length === 0) {
+        return { success: true, count: 0 };
+      }
+
       const records = notificationIds.map(id => ({
         Id: parseInt(id),
         read: true
@@ -368,11 +376,12 @@ userNotifications.map(async (notification) => {
       if (error?.response?.data?.message) {
         console.error("Error marking selected notifications as read:", error?.response?.data?.message);
       } else {
-        console.error(error.message);
+        console.error("Error marking selected notifications as read:", error.message);
       }
       return { success: false, count: 0 };
     }
   }
+
 
   async getUnreadCount(userId) {
     try {
@@ -380,6 +389,13 @@ userNotifications.map(async (notification) => {
       return unreadNotifications.length;
     } catch (error) {
       console.error("Error getting unread count:", error);
+return unreadNotifications.length;
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error fetching unread count:", error?.response?.data?.message);
+      } else {
+        console.error("Error fetching unread count:", error.message);
+      }
       return 0;
     }
   }
@@ -421,8 +437,12 @@ userNotifications.map(async (notification) => {
     }
   }
 
-  async deleteMultiple(notificationIds) {
+async deleteMultiple(notificationIds) {
     try {
+      if (!notificationIds || notificationIds.length === 0) {
+        return { success: true, count: 0 };
+      }
+
       const params = {
         RecordIds: notificationIds.map(id => parseInt(id))
       };
@@ -453,6 +473,7 @@ userNotifications.map(async (notification) => {
       return { success: false, count: 0 };
     }
   }
+
 
   async create(notificationData) {
     try {

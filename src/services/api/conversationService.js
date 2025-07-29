@@ -44,13 +44,12 @@ class ConversationService {
       if (error?.response?.data?.message) {
         console.error("Error fetching conversations:", error?.response?.data?.message);
       } else {
-        console.error(error.message);
+        console.error("Error fetching conversations:", error.message);
       }
       return [];
     }
   }
-
-  async getById(id) {
+async getById(id) {
     try {
       const numericId = parseInt(id);
       if (isNaN(numericId)) {
@@ -87,13 +86,12 @@ class ConversationService {
       if (error?.response?.data?.message) {
         console.error(`Error fetching conversation with ID ${id}:`, error?.response?.data?.message);
       } else {
-        console.error(error.message);
+        console.error("Error fetching conversation by ID:", error.message);
       }
       return null;
     }
   }
-
-  async create(conversationData) {
+async create(conversationData) {
     try {
       const params = {
         records: [

@@ -1,4 +1,4 @@
-import userService from './userService.js';
+import userService from "@/services/api/userService";
 
 class PostService {
   constructor() {
@@ -48,7 +48,7 @@ class PostService {
       if (error?.response?.data?.message) {
         console.error("Error fetching posts:", error?.response?.data?.message);
       } else {
-        console.error(error.message);
+        console.error("Error fetching posts:", error.message);
       }
       return [];
     }
@@ -150,7 +150,7 @@ class PostService {
       if (error?.response?.data?.message) {
         console.error(`Error fetching post with ID ${id}:`, error?.response?.data?.message);
       } else {
-        console.error(error.message);
+        console.error("Error fetching post by ID:", error.message);
       }
       return null;
     }
@@ -198,7 +198,7 @@ class PostService {
       if (error?.response?.data?.message) {
         console.error("Error fetching trending posts:", error?.response?.data?.message);
       } else {
-        console.error(error.message);
+        console.error("Error fetching trending posts:", error.message);
       }
       return [];
     }
@@ -248,13 +248,13 @@ class PostService {
       if (error?.response?.data?.message) {
         console.error("Error fetching user posts:", error?.response?.data?.message);
       } else {
-        console.error(error.message);
+        console.error("Error fetching user posts:", error.message);
       }
       return [];
     }
   }
 
-async create(postData) {
+  async create(postData) {
     try {
       const currentUser = await userService.getCurrentUser();
       
@@ -348,7 +348,7 @@ async create(postData) {
       if (error?.response?.data?.message) {
         console.error("Error creating post:", error?.response?.data?.message);
       } else {
-        console.error(error.message);
+        console.error("Error creating post:", error.message);
       }
       throw error;
     }
@@ -402,7 +402,7 @@ async create(postData) {
       if (error?.response?.data?.message) {
         console.error("Error toggling post like:", error?.response?.data?.message);
       } else {
-        console.error(error.message);
+        console.error("Error toggling post like:", error.message);
       }
       throw error;
     }
@@ -439,7 +439,7 @@ async create(postData) {
       if (error?.response?.data?.message) {
         console.error("Error deleting post:", error?.response?.data?.message);
       } else {
-        console.error(error.message);
+        console.error("Error deleting post:", error.message);
       }
       throw error;
     }
@@ -491,7 +491,7 @@ async create(postData) {
       if (error?.response?.data?.message) {
         console.error("Error adding comment to post:", error?.response?.data?.message);
       } else {
-        console.error(error.message);
+        console.error("Error adding comment to post:", error.message);
       }
       throw error;
     }
@@ -543,7 +543,7 @@ async create(postData) {
       if (error?.response?.data?.message) {
         console.error("Error removing comment from post:", error?.response?.data?.message);
       } else {
-        console.error(error.message);
+        console.error("Error removing comment from post:", error.message);
       }
       throw error;
     }

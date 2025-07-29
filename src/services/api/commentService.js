@@ -40,17 +40,17 @@ class CommentService {
       }
 
       return response.data || [];
-    } catch (error) {
+} catch (error) {
       if (error?.response?.data?.message) {
         console.error("Error fetching post comments:", error?.response?.data?.message);
       } else {
-        console.error(error.message);
+        console.error("Error fetching post comments:", error.message);
       }
       return [];
     }
   }
 
-  async getById(id) {
+async getById(id) {
     try {
       const params = {
         fields: [
@@ -75,13 +75,14 @@ class CommentService {
       if (error?.response?.data?.message) {
         console.error(`Error fetching comment with ID ${id}:`, error?.response?.data?.message);
       } else {
-        console.error(error.message);
+        console.error("Error fetching comment by ID:", error.message);
       }
       return null;
     }
   }
 
-  async create(commentData) {
+
+async create(commentData) {
     try {
       if (!commentData.postId || !commentData.authorId || !commentData.content?.trim()) {
         throw new Error("Post ID, author ID, and content are required");

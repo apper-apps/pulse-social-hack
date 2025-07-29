@@ -39,13 +39,13 @@ class MessageService {
       if (error?.response?.data?.message) {
         console.error("Error fetching messages:", error?.response?.data?.message);
       } else {
-        console.error(error.message);
+        console.error("Error fetching messages:", error.message);
       }
       return [];
     }
   }
 
-  async getByConversationId(conversationId) {
+async getByConversationId(conversationId) {
     try {
       const numericId = parseInt(conversationId);
       if (isNaN(numericId)) {
@@ -93,7 +93,7 @@ class MessageService {
     }
   }
 
-  async create(messageData) {
+async create(messageData) {
     try {
       const params = {
         records: [
@@ -245,7 +245,6 @@ class MessageService {
     }
   }
 }
-
 // Create instance and export
 const messageService = new MessageService();
 

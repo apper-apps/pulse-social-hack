@@ -13,7 +13,7 @@ class UserService {
   async getAll() {
     try {
       const params = {
-fields: [
+        fields: [
           { field: { Name: "Name" } },
           { field: { Name: "Tags" } },
           { field: { Name: "username" } },
@@ -24,13 +24,19 @@ fields: [
           { field: { Name: "followersCount" } },
           { field: { Name: "followingCount" } },
           { field: { Name: "postsCount" } }
+        ],
+        orderBy: [
+          {
+            fieldName: "displayName",
+            sorttype: "ASC"
+          }
         ]
       };
 
       const response = await this.apperClient.fetchRecords(this.tableName, params);
       
       if (!response.success) {
-        console.error(response.message);
+        console.error("Error fetching users:", response.message);
         return [];
       }
 
@@ -39,13 +45,13 @@ fields: [
       if (error?.response?.data?.message) {
         console.error("Error fetching users:", error?.response?.data?.message);
       } else {
-        console.error(error.message);
+        console.error("Error fetching users:", error.message);
       }
       return [];
     }
   }
 
-async getById(id) {
+  async getById(id) {
     try {
       // Extract ID if object is passed, otherwise use the value directly
       const idValue = typeof id === 'object' && id !== null ? (id.Id || id.id) : id;
@@ -98,7 +104,7 @@ async getById(id) {
           console.error(`Error fetching user with ID ${id}:`, error.response.data.message);
         }
       } else {
-        console.error(`Unexpected error fetching user with ID ${id}:`, error.message);
+        console.error(`Error fetching user with ID ${id}:`, error.message);
       }
       return null;
     }
@@ -109,7 +115,7 @@ async getById(id) {
       // Get the first user as the current logged-in user for demo purposes
       // In a real app, this would come from the authentication context
       const params = {
-fields: [
+        fields: [
           { field: { Name: "Name" } },
           { field: { Name: "Tags" } },
           { field: { Name: "username" } },
@@ -130,7 +136,7 @@ fields: [
       const response = await this.apperClient.fetchRecords(this.tableName, params);
       
       if (!response.success) {
-        console.error(response.message);
+        console.error("Error fetching current user:", response.message);
         return null;
       }
 
@@ -139,7 +145,7 @@ fields: [
       if (error?.response?.data?.message) {
         console.error("Error fetching current user:", error?.response?.data?.message);
       } else {
-        console.error(error.message);
+        console.error("Error fetching current user:", error.message);
       }
       return null;
     }
@@ -166,7 +172,7 @@ fields: [
       const response = await this.apperClient.updateRecord(this.tableName, params);
       
       if (!response.success) {
-        console.error(response.message);
+        console.error("Error updating user profile:", response.message);
         throw new Error(response.message);
       }
 
@@ -191,7 +197,7 @@ fields: [
       if (error?.response?.data?.message) {
         console.error("Error updating user profile:", error?.response?.data?.message);
       } else {
-        console.error(error.message);
+        console.error("Error updating user profile:", error.message);
       }
       throw error;
     }
@@ -315,10 +321,16 @@ fields: [
   }
 
   async getFollowingIds(userId) {
-    const id = parseInt(userId);
-    return Array.from(this.followRelationships.get(id) || new Set());
+    try {
+      const id = parseInt(userId);
+      return Array.from(this.followRelationships.get(id) || new Set());
+    } catch (error) {
+      console.error("Error fetching following IDs:", error);
+      return [];
+    }
   }
 
+  // Synchronous method for quick follow status checks
   isFollowingSync(targetUserId) {
     const currentUserId = 1; // Assuming current user is always user 1
     const targetId = parseInt(targetUserId);
