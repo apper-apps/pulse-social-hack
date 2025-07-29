@@ -13,7 +13,7 @@ class UserService {
   async getAll() {
     try {
       const params = {
-        fields: [
+fields: [
           { field: { Name: "Name" } },
           { field: { Name: "Tags" } },
           { field: { Name: "username" } },
@@ -48,7 +48,7 @@ class UserService {
   async getById(id) {
     try {
       const params = {
-        fields: [
+fields: [
           { field: { Name: "Name" } },
           { field: { Name: "Tags" } },
           { field: { Name: "username" } },
@@ -85,7 +85,7 @@ class UserService {
       // Get the first user as the current logged-in user for demo purposes
       // In a real app, this would come from the authentication context
       const params = {
-        fields: [
+fields: [
           { field: { Name: "Name" } },
           { field: { Name: "Tags" } },
           { field: { Name: "username" } },
