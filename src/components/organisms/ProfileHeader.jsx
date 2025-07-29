@@ -1,0 +1,97 @@
+import React from "react";
+import { motion } from "framer-motion";
+import Avatar from "@/components/atoms/Avatar";
+import Button from "@/components/atoms/Button";
+import ApperIcon from "@/components/ApperIcon";
+
+const ProfileHeader = ({ user, isCurrentUser = false, onEdit }) => {
+  if (!user) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="card overflow-hidden mb-6"
+    >
+      {/* Cover Photo */}
+      <div className="relative h-48 bg-gradient-to-br from-primary-400 to-primary-600">
+        {user.coverPhoto ? (
+          <img
+            src={user.coverPhoto}
+            alt="Cover"
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-primary-400 via-primary-500 to-primary-600"></div>
+        )}
+      </div>
+
+      {/* Profile Info */}
+      <div className="p-6">
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between -mt-16 mb-4">
+          <div className="flex flex-col sm:flex-row sm:items-end sm:space-x-4">
+            <Avatar
+              src={user.profilePicture}
+              alt={user.displayName}
+              size="xl"
+              className="border-4 border-white shadow-lg mb-4 sm:mb-0"
+            />
+            <div className="sm:mb-2">
+              <h1 className="text-2xl font-display font-bold text-gray-900 mb-1">
+                {user.displayName}
+              </h1>
+              <p className="text-gray-600 mb-2">@{user.username}</p>
+              {user.bio && (
+                <p className="text-gray-700 leading-relaxed max-w-md">
+                  {user.bio}
+                </p>
+              )}
+            </div>
+          </div>
+          
+          {isCurrentUser ? (
+            <Button
+              variant="secondary"
+              onClick={onEdit}
+              icon="Edit"
+              className="self-start sm:self-auto mt-4 sm:mt-0"
+            >
+              Edit Profile
+            </Button>
+          ) : (
+            <div className="flex space-x-3 self-start sm:self-auto mt-4 sm:mt-0">
+              <Button icon="UserPlus">
+                Follow
+              </Button>
+              <Button variant="secondary" icon="MessageSquare">
+                Message
+              </Button>
+            </div>
+          )}
+        </div>
+
+        {/* Stats */}
+        <div className="flex items-center space-x-6 pt-4 border-t border-gray-100">
+          <div className="flex items-center space-x-2">
+            <ApperIcon name="FileText" className="w-4 h-4 text-gray-500" />
+            <span className="font-semibold text-gray-900">{user.postsCount}</span>
+            <span className="text-gray-600">Posts</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <ApperIcon name="Users" className="w-4 h-4 text-gray-500" />
+            <span className="font-semibold text-gray-900">{user.followersCount}</span>
+            <span className="text-gray-600">Followers</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <ApperIcon name="UserCheck" className="w-4 h-4 text-gray-500" />
+            <span className="font-semibold text-gray-900">{user.followingCount}</span>
+            <span className="text-gray-600">Following</span>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+export default ProfileHeader;

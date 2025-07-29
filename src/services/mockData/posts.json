@@ -1,0 +1,90 @@
+[
+  {
+    "Id": 1,
+    "authorId": 1,
+    "content": "Just finished designing a new mobile app interface! The satisfaction of seeing your ideas come to life never gets old ✨ What's everyone working on today?",
+    "imageUrl": "https://images.unsplash.com/photo-1559028006-448665bd7c7f?w=600&h=400&fit=crop",
+    "likes": 42,
+    "isLiked": false,
+    "comments": 8,
+    "shares": 3,
+    "timestamp": "2024-01-20T14:30:00Z"
+  },
+  {
+    "Id": 2,
+    "authorId": 2,
+    "content": "Golden hour in Bali never disappoints 🌅 Sometimes you have to wake up at 5 AM for the perfect shot, but moments like these make it all worth it. Nature is the best artist.",
+    "imageUrl": "https://images.unsplash.com/photo-1537953773345-d172ccf13cf1?w=600&h=400&fit=crop",
+    "likes": 127,
+    "isLiked": true,
+    "comments": 23,
+    "shares": 15,
+    "timestamp": "2024-01-20T06:45:00Z"
+  },
+  {
+    "Id": 3,
+    "authorId": 3,
+    "content": "Spent the weekend building a React component library from scratch. There's something deeply satisfying about writing clean, reusable code that other developers can benefit from 👨‍💻",
+    "imageUrl": null,
+    "likes": 89,
+    "isLiked": false,
+    "comments": 12,
+    "shares": 7,
+    "timestamp": "2024-01-19T22:15:00Z"
+  },
+  {
+    "Id": 4,
+    "authorId": 4,
+    "content": "Morning workout complete! 💪 Remember, consistency beats perfection every single time. Small steps daily lead to big changes yearly. What's your favorite way to start the day?",
+    "imageUrl": "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&h=400&fit=crop",
+    "likes": 73,
+    "isLiked": true,
+    "comments": 18,
+    "shares": 5,
+    "timestamp": "2024-01-19T08:00:00Z"
+  },
+  {
+    "Id": 5,
+    "authorId": 5,
+    "content": "Just wrapped up an incredible pitch session with three promising startups. The innovation and passion in today's entrepreneurial ecosystem is absolutely inspiring 🚀 The future is bright!",
+    "imageUrl": "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=600&h=400&fit=crop",
+    "likes": 156,
+    "isLiked": false,
+    "comments": 34,
+    "shares": 22,
+    "timestamp": "2024-01-19T16:20:00Z"
+  },
+  {
+    "Id": 6,
+    "authorId": 1,
+    "content": "Coffee shop sessions are where the magic happens ☕ Sometimes a change of scenery is all you need to unlock your creativity. Where do you do your best work?",
+    "imageUrl": "https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=600&h=400&fit=crop",
+    "likes": 31,
+    "isLiked": true,
+    "comments": 6,
+    "shares": 2,
+    "timestamp": "2024-01-18T11:30:00Z"
+  },
+  {
+    "Id": 7,
+    "authorId": 2,
+    "content": "Street food adventures in Vietnam continue! 🍜 This bowl of pho might be the best I've ever had. Travel tip: always eat where the locals eat - that's where you'll find the real gems.",
+    "imageUrl": "https://images.unsplash.com/photo-1559329007-40df8a9345d8?w=600&h=400&fit=crop",
+    "likes": 94,
+    "isLiked": false,
+    "comments": 15,
+    "shares": 8,
+    "timestamp": "2024-01-18T19:45:00Z"
+  },
+  {
+    "Id": 8,
+    "authorId": 3,
+    "content": "Debugging session turned into a 6-hour deep dive, but we finally cracked it! 🎉 There's no feeling quite like solving a complex problem that's been nagging you for days. Time for celebration pizza!",
+    "imageUrl": null,
+    "likes": 67,
+    "isLiked": true,
+    "comments": 9,
+    "shares": 4,
+    "timestamp": "2024-01-17T21:10:00Z"
+  }
+]

@@ -1,0 +1,57 @@
+[
+  {
+    "Id": 1,
+    "username": "alexchen",
+    "displayName": "Alex Chen",
+    "bio": "UI/UX Designer passionate about creating beautiful digital experiences ✨ Coffee enthusiast ☕",
+    "profilePicture": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+    "coverPhoto": "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=800&h=300&fit=crop",
+    "followersCount": 1247,
+    "followingCount": 234,
+    "postsCount": 89
+  },
+  {
+    "Id": 2,
+    "username": "sarahkim",
+    "displayName": "Sarah Kim",
+    "bio": "Travel photographer 📸 Currently exploring Southeast Asia 🌏 Sharing moments that matter",
+    "profilePicture": "https://images.unsplash.com/photo-1494790108755-2616b612c002?w=150&h=150&fit=crop&crop=face",
+    "coverPhoto": "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&h=300&fit=crop",
+    "followersCount": 3421,
+    "followingCount": 567,
+    "postsCount": 156
+  },
+  {
+    "Id": 3,
+    "username": "mikejohnson",
+    "displayName": "Mike Johnson",
+    "bio": "Software engineer by day, food blogger by night 👨‍💻🍕 Building the future one line of code at a time",
+    "profilePicture": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+    "coverPhoto": "https://images.unsplash.com/photo-1531297484001-80022131f5a1?w=800&h=300&fit=crop",
+    "followersCount": 892,
+    "followingCount": 145,
+    "postsCount": 67
+  },
+  {
+    "Id": 4,
+    "username": "emilydavis",
+    "displayName": "Emily Davis",
+    "bio": "Fitness coach & wellness advocate 💪 Helping people live their healthiest lives • Mom of two 👶👶",
+    "profilePicture": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
+    "coverPhoto": "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=300&fit=crop",
+    "followersCount": 2156,
+    "followingCount": 389,
+    "postsCount": 234
+  },
+  {
+    "Id": 5,
+    "username": "davidlee",
+    "displayName": "David Lee",
+    "bio": "Entrepreneur & startup mentor 🚀 Building the next generation of tech companies • Angel investor",
+    "profilePicture": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
+    "coverPhoto": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&h=300&fit=crop",
+    "followersCount": 5234,
+    "followingCount": 823,
+    "postsCount": 145
+  }
+]
