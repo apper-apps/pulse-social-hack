@@ -228,8 +228,6 @@ class NotificationService {
     return content || null;
   }
 }
-
-export default new NotificationService();
 // Create instance and export
 const notificationService = new NotificationService();
 
