@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { toast } from "react-toastify";
-import FollowModal from "@/components/organisms/FollowModal";
 import userService from "@/services/api/userService";
 import ApperIcon from "@/components/ApperIcon";
+import FollowModal from "@/components/organisms/FollowModal";
 import Button from "@/components/atoms/Button";
 import Avatar from "@/components/atoms/Avatar";
 const ProfileHeader = ({ user, isCurrentUser = false, onEdit, onFollowChange }) => {
@@ -97,11 +97,11 @@ const ProfileHeader = ({ user, isCurrentUser = false, onEdit, onFollowChange }) 
                 <p className="text-gray-700 leading-relaxed max-w-md">
                   {user.bio}
                 </p>
-              )}
+)}
             </div>
           </div>
           
-{isCurrentUser ? (
+          {isCurrentUser ? (
             <Button
               variant="secondary"
               onClick={onEdit}
@@ -150,7 +150,7 @@ const ProfileHeader = ({ user, isCurrentUser = false, onEdit, onFollowChange }) 
             <span className="font-semibold text-gray-900">{user.followingCount}</span>
             <span className="text-gray-600">Following</span>
           </button>
-</div>
+        </div>
       </div>
 
       {/* Follow Modal */}
