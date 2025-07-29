@@ -53,13 +53,27 @@ class UserService {
 
   async getById(id) {
     try {
-      // Extract ID if object is passed, otherwise use the value directly
-      const idValue = typeof id === 'object' && id !== null ? (id.Id || id.id) : id;
+// Extract ID if object is passed - handle various object formats
+      let idValue = id;
       
-      // Validate ID before making database call
-      const numericId = parseInt(idValue);
+      // Handle different object structures that might contain ID
+      if (typeof id === 'object' && id !== null) {
+        idValue = id.Id || id.id || id.ID || 
+                  (id.data && (id.data.Id || id.data.id)) ||
+                  (id.value && (id.value.Id || id.value.id));
+      }
+      
+      // Convert to string and validate format
+      const stringId = String(idValue).trim();
+      if (!stringId || stringId === 'undefined' || stringId === 'null' || stringId === '[object Object]') {
+        console.error(`Invalid user ID format provided: ${typeof id === 'object' ? JSON.stringify(id) : id}`);
+        return null;
+      }
+      
+      // Validate ID as numeric
+      const numericId = parseInt(stringId);
       if (isNaN(numericId) || numericId <= 0) {
-        console.error(`Invalid user ID provided: ${idValue}`);
+        console.error(`Invalid user ID value provided: ${stringId} (parsed as: ${numericId})`);
         return null;
       }
 

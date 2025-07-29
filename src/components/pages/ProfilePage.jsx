@@ -34,10 +34,18 @@ const loadProfileData = async () => {
       setLoading(true);
       setError("");
       
-      // Ensure userId is a valid primitive value
-      const idValue = typeof userId === 'object' && userId !== null ? (userId.Id || userId.id) : userId;
-      if (!idValue) {
-        setError("Invalid user ID");
+// Ensure userId is a valid primitive value - handle various object formats
+      let idValue = userId;
+      
+      // Extract ID from object if necessary (handle lookup objects and nested structures)
+      if (typeof userId === 'object' && userId !== null) {
+        idValue = userId.Id || userId.id || userId.ID || (userId.data && (userId.data.Id || userId.data.id));
+      }
+      
+      // Convert to string and validate
+      idValue = String(idValue).trim();
+      if (!idValue || idValue === 'undefined' || idValue === 'null' || idValue === '[object Object]') {
+        setError("Invalid user ID provided");
         setLoading(false);
         return;
       }
