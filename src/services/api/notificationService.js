@@ -1,5 +1,7 @@
-import notifications from "../mockData/notifications.json";
-import userService from "./userService.js";
+import notifications from '../mockData/notifications.json'
+import userService from './userService.js'
+
+// Notification Service Class
 
 class NotificationService {
   constructor() {
@@ -228,3 +230,8 @@ class NotificationService {
 }
 
 export default new NotificationService();
+// Create instance and export
+const notificationService = new NotificationService();
+
+export default notificationService;
+export { notificationService };
