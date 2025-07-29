@@ -47,10 +47,13 @@ fields: [
 
 async getById(id) {
     try {
+      // Extract ID if object is passed, otherwise use the value directly
+      const idValue = typeof id === 'object' && id !== null ? (id.Id || id.id) : id;
+      
       // Validate ID before making database call
-      const numericId = parseInt(id);
+      const numericId = parseInt(idValue);
       if (isNaN(numericId) || numericId <= 0) {
-        console.error(`Invalid user ID provided: ${id}`);
+        console.error(`Invalid user ID provided: ${idValue}`);
         return null;
       }
 

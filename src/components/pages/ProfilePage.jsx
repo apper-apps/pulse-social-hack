@@ -24,6 +24,12 @@ try {
       setLoading(true);
       setError("");
       
+      // Ensure userId is a valid primitive value
+      if (!userId || (typeof userId === 'object' && !userId.Id && !userId.id)) {
+        setError("Invalid user ID");
+        setLoading(false);
+        return;
+      }
       const [userData, userPosts, currentUserData] = await Promise.all([
         userService.getById(userId),
         postService.getByUserId(userId),

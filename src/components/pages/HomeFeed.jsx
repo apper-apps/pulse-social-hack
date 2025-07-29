@@ -29,14 +29,21 @@ try {
         setLoadingMore(true);
       }
 
-      // Get current user and following list
+// Get current user and following list
       const currentUser = await userService.getCurrentUser();
-      const followingIds = await userService.getFollowingIds(currentUser.Id);
+      
+      // Ensure currentUser.Id is a primitive value
+      const currentUserId = typeof currentUser === 'object' && currentUser !== null ? (currentUser.Id || currentUser.id) : currentUser;
+      if (!currentUserId) {
+        throw new Error("Unable to get current user ID");
+      }
+      
+      const followingIds = await userService.getFollowingIds(currentUserId);
       
       let newPosts;
       if (followingIds.length > 0) {
-        // Get posts from followed users
-        newPosts = await postService.getFollowingFeed(currentUser.Id, pageNum, 10);
+// Get posts from followed users
+        newPosts = await postService.getFollowingFeed(currentUserId, pageNum, 10);
         setFeedType("following");
       } else {
         // Show suggested content for new users

@@ -28,14 +28,22 @@ const FollowModal = ({ isOpen, onClose, userId, type, title }) => {
     }
   };
 
-  const loadUsers = async () => {
+const loadUsers = async () => {
     try {
       setLoading(true);
+      
+      // Ensure userId is a primitive value
+      const idValue = typeof userId === 'object' && userId !== null ? (userId.Id || userId.id) : userId;
+      if (!idValue) {
+        console.error("Invalid user ID for loading users");
+        return;
+      }
+      
       let userData;
       if (type === "followers") {
-        userData = await userService.getFollowers(userId);
+        userData = await userService.getFollowers(idValue);
       } else {
-        userData = await userService.getFollowing(userId);
+        userData = await userService.getFollowing(idValue);
       }
       setUsers(userData);
     } catch (error) {
@@ -46,9 +54,11 @@ const FollowModal = ({ isOpen, onClose, userId, type, title }) => {
     }
   };
 
-  const handleFollow = async (targetUserId) => {
+const handleFollow = async (targetUserId) => {
     try {
-      await userService.followUser(targetUserId);
+      // Ensure targetUserId is a primitive value
+      const idValue = typeof targetUserId === 'object' && targetUserId !== null ? (targetUserId.Id || targetUserId.id) : targetUserId;
+      await userService.followUser(idValue);
       setUsers(prevUsers =>
         prevUsers.map(user =>
           user.Id === targetUserId
@@ -63,9 +73,11 @@ const FollowModal = ({ isOpen, onClose, userId, type, title }) => {
     }
   };
 
-  const handleUnfollow = async (targetUserId) => {
+const handleUnfollow = async (targetUserId) => {
     try {
-      await userService.unfollowUser(targetUserId);
+      // Ensure targetUserId is a primitive value  
+      const idValue = typeof targetUserId === 'object' && targetUserId !== null ? (targetUserId.Id || targetUserId.id) : targetUserId;
+      await userService.unfollowUser(idValue);
       setUsers(prevUsers =>
         prevUsers.map(user =>
           user.Id === targetUserId
