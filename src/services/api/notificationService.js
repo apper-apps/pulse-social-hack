@@ -1,7 +1,12 @@
 import userService from "@/services/api/userService";
 
 class NotificationService {
-  constructor() {
+constructor() {
+    // Check if ApperSDK is available
+    if (!window.ApperSDK) {
+      throw new Error('ApperSDK is not loaded. Please ensure the script is included in index.html and loaded before initializing services.');
+    }
+
     // Initialize ApperClient for database operations
     const { ApperClient } = window.ApperSDK;
     this.apperClient = new ApperClient({
