@@ -84,14 +84,26 @@ async getTrendingPosts(limit = 20) {
     return sortedPosts.slice(startIndex, endIndex);
   }
 
-  async create(postData) {
+async create(postData) {
     await this.delay();
     const currentUser = await userService.getCurrentUser();
+    
+    // Handle backward compatibility with imageUrl
+    let mediaUrls = [];
+    if (postData.imageUrl) {
+      mediaUrls = [postData.imageUrl];
+    } else if (postData.mediaFiles && postData.mediaFiles.length > 0) {
+      // In a real app, you'd upload files to a server and get URLs back
+      // For now, we'll use the preview URLs from the file reader
+      mediaUrls = postData.mediaFiles.map(media => media.preview);
+    }
+    
     const newPost = {
       Id: this.nextId++,
       authorId: currentUser.Id,
       content: postData.content,
-      imageUrl: postData.imageUrl || null,
+      imageUrl: mediaUrls.length > 0 ? mediaUrls[0] : null, // Backward compatibility
+      mediaUrls: mediaUrls, // New field for multiple media
       likes: 0,
       isLiked: false,
       comments: 0,
