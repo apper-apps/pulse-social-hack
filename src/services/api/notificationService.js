@@ -163,11 +163,28 @@ class NotificationService {
       
       // Enrich notifications with actor data
       const enrichedNotifications = await Promise.all(
-        userNotifications.map(async (notification) => {
-          const actor = await userService.getById(notification.actorId?.Id || notification.actorId);
+userNotifications.map(async (notification) => {
+          let actor = null;
+          
+          // Validate actor ID before attempting to fetch
+          const actorId = notification.actorId?.Id || notification.actorId;
+          if (actorId && !isNaN(parseInt(actorId))) {
+            try {
+              actor = await userService.getById(parseInt(actorId));
+            } catch (error) {
+              console.error(`Failed to fetch actor with ID ${actorId} for notification ${notification.Id}:`, error.message);
+            }
+          }
+          
+          // Provide fallback actor information if record doesn't exist
           return {
             ...notification,
-            actor: actor || { displayName: 'Unknown User', profilePicture: null }
+            actor: actor || { 
+              Id: actorId || 0,
+              displayName: 'Unknown User', 
+              profilePicture: null,
+              username: 'unknown'
+            }
           };
         })
       );

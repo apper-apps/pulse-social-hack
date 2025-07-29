@@ -45,10 +45,17 @@ fields: [
     }
   }
 
-  async getById(id) {
+async getById(id) {
     try {
+      // Validate ID before making database call
+      const numericId = parseInt(id);
+      if (isNaN(numericId) || numericId <= 0) {
+        console.error(`Invalid user ID provided: ${id}`);
+        return null;
+      }
+
       const params = {
-fields: [
+        fields: [
           { field: { Name: "Name" } },
           { field: { Name: "Tags" } },
           { field: { Name: "username" } },
@@ -62,19 +69,33 @@ fields: [
         ]
       };
 
-      const response = await this.apperClient.getRecordById(this.tableName, parseInt(id), params);
+      const response = await this.apperClient.getRecordById(this.tableName, numericId, params);
       
       if (!response.success) {
-        console.error(response.message);
+        if (response.message && response.message.toLowerCase().includes('record does not exist')) {
+          console.error(`User with ID ${numericId} not found in database`);
+        } else {
+          console.error(`Database error for user ID ${numericId}:`, response.message);
+        }
+        return null;
+      }
+
+      // Ensure we have valid user data
+      if (!response.data) {
+        console.error(`No data returned for user ID ${numericId}`);
         return null;
       }
 
       return response.data;
     } catch (error) {
       if (error?.response?.data?.message) {
-        console.error(`Error fetching user with ID ${id}:`, error?.response?.data?.message);
+        if (error.response.data.message.toLowerCase().includes('record does not exist')) {
+          console.error(`User record with ID ${id} does not exist:`, error.response.data.message);
+        } else {
+          console.error(`Error fetching user with ID ${id}:`, error.response.data.message);
+        }
       } else {
-        console.error(error.message);
+        console.error(`Unexpected error fetching user with ID ${id}:`, error.message);
       }
       return null;
     }
