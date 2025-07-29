@@ -1,10 +1,61 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import Avatar from "@/components/atoms/Avatar";
-import Button from "@/components/atoms/Button";
+import { toast } from "react-toastify";
+import FollowModal from "@/components/organisms/FollowModal";
+import userService from "@/services/api/userService";
 import ApperIcon from "@/components/ApperIcon";
+import Button from "@/components/atoms/Button";
+import Avatar from "@/components/atoms/Avatar";
+const ProfileHeader = ({ user, isCurrentUser = false, onEdit, onFollowChange }) => {
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [followLoading, setFollowLoading] = useState(false);
+  const [showFollowModal, setShowFollowModal] = useState(false);
+  const [modalType, setModalType] = useState("");
+  const [modalTitle, setModalTitle] = useState("");
 
-const ProfileHeader = ({ user, isCurrentUser = false, onEdit }) => {
+  useEffect(() => {
+    if (!isCurrentUser && user) {
+      checkFollowStatus();
+    }
+  }, [user, isCurrentUser]);
+
+  const checkFollowStatus = async () => {
+    try {
+      const status = await userService.isFollowing(user.Id);
+      setIsFollowing(status);
+    } catch (error) {
+      console.error("Failed to check follow status:", error);
+    }
+  };
+
+  const handleFollow = async () => {
+    try {
+      setFollowLoading(true);
+      if (isFollowing) {
+        await userService.unfollowUser(user.Id);
+        setIsFollowing(false);
+        toast.success(`Unfollowed ${user.displayName}`);
+      } else {
+        await userService.followUser(user.Id);
+        setIsFollowing(true);
+        toast.success(`Following ${user.displayName}`);
+      }
+      if (onFollowChange) {
+        onFollowChange();
+      }
+    } catch (error) {
+      console.error("Failed to update follow status:", error);
+      toast.error("Failed to update follow status. Please try again.");
+    } finally {
+      setFollowLoading(false);
+    }
+  };
+
+  const openFollowModal = (type) => {
+    setModalType(type);
+    setModalTitle(type === "followers" ? "Followers" : "Following");
+    setShowFollowModal(true);
+  };
   if (!user) return null;
 
   return (
@@ -50,7 +101,7 @@ const ProfileHeader = ({ user, isCurrentUser = false, onEdit }) => {
             </div>
           </div>
           
-          {isCurrentUser ? (
+{isCurrentUser ? (
             <Button
               variant="secondary"
               onClick={onEdit}
@@ -61,8 +112,13 @@ const ProfileHeader = ({ user, isCurrentUser = false, onEdit }) => {
             </Button>
           ) : (
             <div className="flex space-x-3 self-start sm:self-auto mt-4 sm:mt-0">
-              <Button icon="UserPlus">
-                Follow
+              <Button 
+                icon={isFollowing ? "UserMinus" : "UserPlus"}
+                variant={isFollowing ? "secondary" : "primary"}
+                onClick={handleFollow}
+                loading={followLoading}
+              >
+                {isFollowing ? "Unfollow" : "Follow"}
               </Button>
               <Button variant="secondary" icon="MessageSquare">
                 Message
@@ -78,20 +134,34 @@ const ProfileHeader = ({ user, isCurrentUser = false, onEdit }) => {
             <span className="font-semibold text-gray-900">{user.postsCount}</span>
             <span className="text-gray-600">Posts</span>
           </div>
-          <div className="flex items-center space-x-2">
+<button 
+            onClick={() => openFollowModal("followers")}
+            className="flex items-center space-x-2 hover:bg-gray-100 rounded-lg p-2 transition-colors"
+          >
             <ApperIcon name="Users" className="w-4 h-4 text-gray-500" />
             <span className="font-semibold text-gray-900">{user.followersCount}</span>
             <span className="text-gray-600">Followers</span>
-          </div>
-          <div className="flex items-center space-x-2">
+          </button>
+          <button 
+            onClick={() => openFollowModal("following")}
+            className="flex items-center space-x-2 hover:bg-gray-100 rounded-lg p-2 transition-colors"
+          >
             <ApperIcon name="UserCheck" className="w-4 h-4 text-gray-500" />
             <span className="font-semibold text-gray-900">{user.followingCount}</span>
             <span className="text-gray-600">Following</span>
-          </div>
-        </div>
+          </button>
+</div>
       </div>
+
+      {/* Follow Modal */}
+      <FollowModal 
+        isOpen={showFollowModal}
+        onClose={() => setShowFollowModal(false)}
+        userId={user?.Id}
+        type={modalType}
+        title={modalTitle}
+      />
     </motion.div>
   );
-};
 
 export default ProfileHeader;

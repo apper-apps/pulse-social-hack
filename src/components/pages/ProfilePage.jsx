@@ -8,21 +8,19 @@ import Error from "@/components/ui/Error";
 import Empty from "@/components/ui/Empty";
 import userService from "@/services/api/userService";
 import postService from "@/services/api/postService";
-
 const ProfilePage = () => {
-  const { userId } = useParams();
+const { userId } = useParams();
   const [user, setUser] = useState(null);
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [currentUser, setCurrentUser] = useState(null);
-
+  const [refreshKey, setRefreshKey] = useState(0);
   useEffect(() => {
-    loadProfileData();
-  }, [userId]);
-
+loadProfileData();
+  }, [userId, refreshKey]);
   const loadProfileData = async () => {
-    try {
+try {
       setLoading(true);
       setError("");
       
@@ -32,7 +30,10 @@ const ProfilePage = () => {
         userService.getCurrentUser()
       ]);
       
-      setUser(userData);
+      // Get updated user data with current follow counts
+      const updatedUserData = await userService.getById(userId);
+      
+      setUser(updatedUserData);
       setPosts(userPosts);
       setCurrentUser(currentUserData);
       
@@ -44,8 +45,12 @@ const ProfilePage = () => {
     }
   };
 
-  const handleRetry = () => {
+const handleRetry = () => {
     loadProfileData();
+  };
+
+  const handleFollowChange = () => {
+    setRefreshKey(prev => prev + 1);
   };
 
   const isCurrentUser = currentUser && user && currentUser.Id === user.Id;
@@ -54,7 +59,7 @@ const ProfilePage = () => {
   if (error) return <Error message={error} onRetry={handleRetry} />;
   if (!user) return <Error message="User not found" />;
 
-  return (
+return (
     <div className="p-4 lg:p-6">
       <motion.div
         initial={{ opacity: 0 }}
@@ -66,6 +71,7 @@ const ProfilePage = () => {
           user={user}
           isCurrentUser={isCurrentUser}
           onEdit={() => console.log("Edit profile")}
+          onFollowChange={handleFollowChange}
         />
 
         {/* Posts Section */}

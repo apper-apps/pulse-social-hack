@@ -1,6 +1,5 @@
 import posts from "../mockData/posts.json";
 import userService from "./userService.js";
-
 class PostService {
   constructor() {
     this.posts = [...posts];
@@ -9,7 +8,7 @@ class PostService {
   }
 
   async delay() {
-    return new Promise(resolve => setTimeout(resolve, Math.random() * 400 + 200));
+return new Promise(resolve => setTimeout(resolve, Math.random() * 400 + 200));
   }
 
   async getAll(page = 1, limit = 10) {
@@ -20,7 +19,44 @@ class PostService {
     return sortedPosts.slice(startIndex, endIndex);
   }
 
-  async getById(id) {
+  async getFollowingFeed(userId, page = 1, limit = 10) {
+    await this.delay();
+    const followingIds = await userService.getFollowingIds(userId);
+    
+    if (followingIds.length === 0) {
+      // If not following anyone, return suggested content (all posts)
+      return this.getAll(page, limit);
+    }
+
+    // Filter posts from followed users
+    const followingPosts = this.posts.filter(post => 
+      followingIds.includes(post.authorId)
+    );
+
+    // If we have very few posts from following, supplement with suggested content
+    if (followingPosts.length < 5) {
+      const allPosts = [...this.posts];
+      const suggestedPosts = allPosts.filter(post => 
+        !followingIds.includes(post.authorId) && post.authorId !== userId
+      );
+      
+      // Mix following posts with suggested posts
+      const mixedPosts = [...followingPosts, ...suggestedPosts.slice(0, 8)];
+      const sortedPosts = mixedPosts.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+      
+      const startIndex = (page - 1) * limit;
+      const endIndex = startIndex + limit;
+      return sortedPosts.slice(startIndex, endIndex);
+    }
+
+    // Sort by timestamp and paginate
+    const sortedPosts = followingPosts.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    return sortedPosts.slice(startIndex, endIndex);
+  }
+
+async getById(id) {
     await this.delay();
     return this.posts.find(post => post.Id === parseInt(id));
   }

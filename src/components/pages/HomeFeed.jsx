@@ -1,13 +1,15 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { toast } from "react-toastify";
-import Button from "@/components/atoms/Button";
-import PostCard from "@/components/organisms/PostCard";
+import userService from "@/services/api/userService";
+import postService from "@/services/api/postService";
+import ApperIcon from "@/components/ApperIcon";
 import CreatePostModal from "@/components/organisms/CreatePostModal";
+import PostCard from "@/components/organisms/PostCard";
 import Loading from "@/components/ui/Loading";
 import Error from "@/components/ui/Error";
 import Empty from "@/components/ui/Empty";
-import postService from "@/services/api/postService";
+import Button from "@/components/atoms/Button";
 
 const HomeFeed = () => {
   const [posts, setPosts] = useState([]);
@@ -17,9 +19,9 @@ const HomeFeed = () => {
   const [hasMore, setHasMore] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
-
+  const [feedType, setFeedType] = useState("following"); // "following" or "suggested"
   const loadPosts = useCallback(async (pageNum = 1, append = false) => {
-    try {
+try {
       if (!append) {
         setLoading(true);
         setError("");
@@ -27,7 +29,20 @@ const HomeFeed = () => {
         setLoadingMore(true);
       }
 
-      const newPosts = await postService.getAll(pageNum, 10);
+      // Get current user and following list
+      const currentUser = await userService.getCurrentUser();
+      const followingIds = await userService.getFollowingIds(currentUser.Id);
+      
+      let newPosts;
+      if (followingIds.length > 0) {
+        // Get posts from followed users
+        newPosts = await postService.getFollowingFeed(currentUser.Id, pageNum, 10);
+        setFeedType("following");
+      } else {
+        // Show suggested content for new users
+        newPosts = await postService.getAll(pageNum, 10);
+        setFeedType("suggested");
+      }
       
       if (append) {
         setPosts(prev => [...prev, ...newPosts]);
@@ -46,12 +61,11 @@ const HomeFeed = () => {
     }
   }, []);
 
-  useEffect(() => {
+useEffect(() => {
     loadPosts(1, false);
   }, [loadPosts]);
-
   const handleLoadMore = () => {
-    if (!loadingMore && hasMore) {
+if (!loadingMore && hasMore) {
       const nextPage = page + 1;
       setPage(nextPage);
       loadPosts(nextPage, true);
@@ -86,19 +100,35 @@ const HomeFeed = () => {
   if (error) return <Error message={error} onRetry={handleRetry} />;
 
   return (
-    <div className="p-4 lg:p-6">
+<div className="p-4 lg:p-6">
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h1 className="text-2xl font-display font-bold text-gray-900">
-              Home Feed
+              {feedType === "following" ? "Following Feed" : "Discover Posts"}
             </h1>
             <p className="text-gray-600">
-              Stay connected with your community
+              {feedType === "following" 
+                ? "Posts from people you follow" 
+                : "Discover amazing content from your community"
+              }
             </p>
           </div>
         </div>
+
+        {/* Feed Type Indicator */}
+        {feedType === "suggested" && (
+          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="flex items-center">
+              <ApperIcon name="Info" className="w-4 h-4 text-blue-600 mr-2" />
+              <p className="text-sm text-blue-800">
+                Follow people to see their posts in your personalized feed! 
+                Currently showing suggested content.
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Create Post Button */}
         <motion.div
@@ -119,8 +149,12 @@ const HomeFeed = () => {
       {/* Posts */}
       {posts.length === 0 ? (
         <Empty
-          title="No posts yet"
-          message="Be the first to share something with your community! Create a post to get started."
+          title={feedType === "following" ? "No posts from your follows yet" : "No posts yet"}
+          message={
+            feedType === "following" 
+              ? "The people you follow haven't posted recently. Check back later or discover new people to follow!"
+              : "Be the first to share something with your community! Create a post to get started."
+          }
           actionText="Create Your First Post"
           onAction={() => setShowCreateModal(true)}
           icon="FileText"
