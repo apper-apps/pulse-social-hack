@@ -383,13 +383,10 @@ async markSelectedAsRead(notificationIds) {
   }
 
 
-  async getUnreadCount(userId) {
+async getUnreadCount(userId) {
     try {
       const unreadNotifications = await this.getByUserId(userId, { unreadOnly: true });
       return unreadNotifications.length;
-    } catch (error) {
-      console.error("Error getting unread count:", error);
-return unreadNotifications.length;
     } catch (error) {
       if (error?.response?.data?.message) {
         console.error("Error fetching unread count:", error?.response?.data?.message);
