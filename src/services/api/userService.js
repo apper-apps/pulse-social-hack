@@ -1,162 +1,296 @@
-import users from "../mockData/users.json";
 class UserService {
-constructor() {
-    this.users = [...users];
-    this.followRelationships = new Map(); // currentUserId -> Set of followedUserIds
-    this.initializeFollowCounts();
-  }
-
-  initializeFollowCounts() {
-    // Initialize some sample follow relationships
-    this.followRelationships.set(1, new Set([2, 3])); // Alex follows Sarah and Mike
-    this.followRelationships.set(2, new Set([1, 4, 5])); // Sarah follows Alex, Emily, David
-    this.followRelationships.set(3, new Set([1, 2])); // Mike follows Alex and Sarah
-    this.followRelationships.set(4, new Set([2, 5])); // Emily follows Sarah and David
-    this.followRelationships.set(5, new Set([1, 2, 3, 4])); // David follows everyone
-    
-    // Update follow counts based on relationships
-    this.users.forEach(user => {
-      user.followingCount = this.followRelationships.get(user.Id)?.size || 0;
-      user.followersCount = this.getFollowersCount(user.Id);
+  constructor() {
+    // Initialize ApperClient for database operations
+    const { ApperClient } = window.ApperSDK;
+    this.apperClient = new ApperClient({
+      apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+      apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
     });
-  }
-
-  getFollowersCount(userId) {
-    let count = 0;
-    for (const [, followedUsers] of this.followRelationships) {
-      if (followedUsers.has(userId)) {
-        count++;
-      }
-    }
-    return count;
-  }
-
-async delay() {
-    return new Promise(resolve => setTimeout(resolve, Math.random() * 300 + 200));
+    this.tableName = 'app_User';
+    this.followRelationships = new Map(); // currentUserId -> Set of followedUserIds
   }
 
   async getAll() {
-    await this.delay();
-    return [...this.users];
+    try {
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "Tags" } },
+          { field: { Name: "username" } },
+          { field: { Name: "displayName" } },
+          { field: { Name: "bio" } },
+          { field: { Name: "profilePicture" } },
+          { field: { Name: "coverPhoto" } },
+          { field: { Name: "followersCount" } },
+          { field: { Name: "followingCount" } },
+          { field: { Name: "postsCount" } }
+        ]
+      };
+
+      const response = await this.apperClient.fetchRecords(this.tableName, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        return [];
+      }
+
+      return response.data || [];
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error fetching users:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      return [];
+    }
   }
 
   async getById(id) {
-    await this.delay();
-    const user = this.users.find(user => user.Id === parseInt(id));
-    if (user) {
-      // Ensure follow counts are current
-      user.followingCount = this.followRelationships.get(user.Id)?.size || 0;
-      user.followersCount = this.getFollowersCount(user.Id);
+    try {
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "Tags" } },
+          { field: { Name: "username" } },
+          { field: { Name: "displayName" } },
+          { field: { Name: "bio" } },
+          { field: { Name: "profilePicture" } },
+          { field: { Name: "coverPhoto" } },
+          { field: { Name: "followersCount" } },
+          { field: { Name: "followingCount" } },
+          { field: { Name: "postsCount" } }
+        ]
+      };
+
+      const response = await this.apperClient.getRecordById(this.tableName, parseInt(id), params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        return null;
+      }
+
+      return response.data;
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error(`Error fetching user with ID ${id}:`, error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      return null;
     }
-    return user;
   }
 
   async getCurrentUser() {
-    await this.delay();
-    // Return the first user as the current logged-in user
-    const user = this.users[0];
-    if (user) {
-      user.followingCount = this.followRelationships.get(user.Id)?.size || 0;
-      user.followersCount = this.getFollowersCount(user.Id);
+    try {
+      // Get the first user as the current logged-in user for demo purposes
+      // In a real app, this would come from the authentication context
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "Tags" } },
+          { field: { Name: "username" } },
+          { field: { Name: "displayName" } },
+          { field: { Name: "bio" } },
+          { field: { Name: "profilePicture" } },
+          { field: { Name: "coverPhoto" } },
+          { field: { Name: "followersCount" } },
+          { field: { Name: "followingCount" } },
+          { field: { Name: "postsCount" } }
+        ],
+        pagingInfo: {
+          limit: 1,
+          offset: 0
+        }
+      };
+
+      const response = await this.apperClient.fetchRecords(this.tableName, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        return null;
+      }
+
+      return response.data && response.data.length > 0 ? response.data[0] : null;
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error fetching current user:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      return null;
     }
-    return user;
   }
 
   async updateProfile(id, data) {
-    await this.delay();
-    const userIndex = this.users.findIndex(user => user.Id === parseInt(id));
-    if (userIndex !== -1) {
-      this.users[userIndex] = { ...this.users[userIndex], ...data };
-      return this.users[userIndex];
+    try {
+      const params = {
+        records: [
+          {
+            Id: parseInt(id),
+            username: data.username,
+            displayName: data.displayName,
+            bio: data.bio,
+            profilePicture: data.profilePicture,
+            coverPhoto: data.coverPhoto,
+            followersCount: data.followersCount,
+            followingCount: data.followingCount,
+            postsCount: data.postsCount
+          }
+        ]
+      };
+
+      const response = await this.apperClient.updateRecord(this.tableName, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        throw new Error(response.message);
+      }
+
+      if (response.results) {
+        const successfulUpdates = response.results.filter(result => result.success);
+        const failedUpdates = response.results.filter(result => !result.success);
+        
+        if (failedUpdates.length > 0) {
+          console.error(`Failed to update user profile ${failedUpdates.length} records:${JSON.stringify(failedUpdates)}`);
+          
+          failedUpdates.forEach(record => {
+            record.errors?.forEach(error => {
+              throw new Error(`${error.fieldLabel}: ${error.message}`);
+            });
+            if (record.message) throw new Error(record.message);
+          });
+        }
+        
+        return successfulUpdates[0]?.data;
+      }
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error updating user profile:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      throw error;
     }
-    throw new Error("User not found");
   }
 
   async followUser(targetUserId) {
-    await this.delay();
-    const currentUser = await this.getCurrentUser();
-    const targetId = parseInt(targetUserId);
-    
-    if (currentUser.Id === targetId) {
-      throw new Error("Cannot follow yourself");
-    }
+    try {
+      const currentUser = await this.getCurrentUser();
+      const targetId = parseInt(targetUserId);
+      
+      if (currentUser.Id === targetId) {
+        throw new Error("Cannot follow yourself");
+      }
 
-    if (!this.followRelationships.has(currentUser.Id)) {
-      this.followRelationships.set(currentUser.Id, new Set());
-    }
+      if (!this.followRelationships.has(currentUser.Id)) {
+        this.followRelationships.set(currentUser.Id, new Set());
+      }
 
-    this.followRelationships.get(currentUser.Id).add(targetId);
-    
-    // Update follow counts
-    const targetUser = this.users.find(u => u.Id === targetId);
-    if (targetUser) {
-      targetUser.followersCount = this.getFollowersCount(targetId);
+      this.followRelationships.get(currentUser.Id).add(targetId);
+      
+      // Update follow counts in database
+      const targetUser = await this.getById(targetId);
+      if (targetUser) {
+        const newFollowersCount = (targetUser.followersCount || 0) + 1;
+        await this.updateProfile(targetId, { 
+          ...targetUser, 
+          followersCount: newFollowersCount 
+        });
+      }
+      
+      return { success: true };
+    } catch (error) {
+      console.error("Error following user:", error);
+      throw error;
     }
-    
-    return { success: true };
   }
 
   async unfollowUser(targetUserId) {
-    await this.delay();
-    const currentUser = await this.getCurrentUser();
-    const targetId = parseInt(targetUserId);
+    try {
+      const currentUser = await this.getCurrentUser();
+      const targetId = parseInt(targetUserId);
 
-    if (this.followRelationships.has(currentUser.Id)) {
-      this.followRelationships.get(currentUser.Id).delete(targetId);
+      if (this.followRelationships.has(currentUser.Id)) {
+        this.followRelationships.get(currentUser.Id).delete(targetId);
+      }
+
+      // Update follow counts in database
+      const targetUser = await this.getById(targetId);
+      if (targetUser) {
+        const newFollowersCount = Math.max((targetUser.followersCount || 0) - 1, 0);
+        await this.updateProfile(targetId, { 
+          ...targetUser, 
+          followersCount: newFollowersCount 
+        });
+      }
+
+      return { success: true };
+    } catch (error) {
+      console.error("Error unfollowing user:", error);
+      throw error;
     }
-
-    // Update follow counts
-    const targetUser = this.users.find(u => u.Id === targetId);
-    if (targetUser) {
-      targetUser.followersCount = this.getFollowersCount(targetId);
-    }
-
-    return { success: true };
   }
 
   async isFollowing(targetUserId) {
-    await this.delay();
-    const currentUser = await this.getCurrentUser();
-    const targetId = parseInt(targetUserId);
-    
-    return this.followRelationships.get(currentUser.Id)?.has(targetId) || false;
+    try {
+      const currentUser = await this.getCurrentUser();
+      const targetId = parseInt(targetUserId);
+      
+      return this.followRelationships.get(currentUser.Id)?.has(targetId) || false;
+    } catch (error) {
+      console.error("Error checking follow status:", error);
+      return false;
+    }
   }
 
   async getFollowing(userId) {
-    await this.delay();
-    const id = parseInt(userId);
-    const followingIds = this.followRelationships.get(id) || new Set();
-    
-    return this.users
-      .filter(user => followingIds.has(user.Id))
-      .map(user => ({
-        ...user,
-        isFollowing: this.isFollowingSync(user.Id)
-      }));
+    try {
+      const id = parseInt(userId);
+      const followingIds = this.followRelationships.get(id) || new Set();
+      
+      if (followingIds.size === 0) {
+        return [];
+      }
+
+      const allUsers = await this.getAll();
+      return allUsers
+        .filter(user => followingIds.has(user.Id))
+        .map(user => ({
+          ...user,
+          isFollowing: this.isFollowingSync(user.Id)
+        }));
+    } catch (error) {
+      console.error("Error fetching following users:", error);
+      return [];
+    }
   }
 
   async getFollowers(userId) {
-    await this.delay();
-    const id = parseInt(userId);
-    const followers = [];
-    
-    for (const [followerId, followedUsers] of this.followRelationships) {
-      if (followedUsers.has(id)) {
-        const follower = this.users.find(u => u.Id === followerId);
-        if (follower) {
-          followers.push({
-            ...follower,
-            isFollowing: this.isFollowingSync(follower.Id)
-          });
+    try {
+      const id = parseInt(userId);
+      const followers = [];
+      const allUsers = await this.getAll();
+      
+      for (const [followerId, followedUsers] of this.followRelationships) {
+        if (followedUsers.has(id)) {
+          const follower = allUsers.find(u => u.Id === followerId);
+          if (follower) {
+            followers.push({
+              ...follower,
+              isFollowing: this.isFollowingSync(follower.Id)
+            });
+          }
         }
       }
+      
+      return followers;
+    } catch (error) {
+      console.error("Error fetching followers:", error);
+      return [];
     }
-    
-    return followers;
   }
 
   async getFollowingIds(userId) {
-    await this.delay();
     const id = parseInt(userId);
     return Array.from(this.followRelationships.get(id) || new Set());
   }
@@ -168,4 +302,8 @@ async delay() {
   }
 }
 
+// Create instance and export
+const userService = new UserService();
+
+export default userService;
 export default new UserService();

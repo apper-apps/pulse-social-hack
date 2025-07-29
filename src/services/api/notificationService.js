@@ -1,154 +1,497 @@
-import notifications from "../mockData/notifications.json";
-import userService from "./userService.js";
-
-// Notification Service Class
+import userService from './userService.js';
 
 class NotificationService {
   constructor() {
-    this.notifications = [...notifications];
-    this.nextId = Math.max(...this.notifications.map(n => n.Id)) + 1;
-  }
-
-  async delay() {
-    return new Promise(resolve => setTimeout(resolve, Math.random() * 300 + 200));
+    // Initialize ApperClient for database operations
+    const { ApperClient } = window.ApperSDK;
+    this.apperClient = new ApperClient({
+      apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+      apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+    });
+    this.tableName = 'app_Notification';
   }
 
   async getAll() {
-    await this.delay();
-    return [...this.notifications].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    try {
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "Tags" } },
+          { field: { Name: "type" } },
+          { field: { Name: "targetType" } },
+          { field: { Name: "conversationId" } },
+          { field: { Name: "commentId" } },
+          { field: { Name: "content" } },
+          { field: { Name: "commentText" } },
+          { field: { Name: "timestamp" } },
+          { field: { Name: "read" } },
+          { field: { Name: "createdAt" } },
+          { field: { Name: "actorId" } },
+          { field: { Name: "targetId" } },
+          { field: { Name: "postId" } }
+        ],
+        orderBy: [
+          { fieldName: "timestamp", sorttype: "DESC" }
+        ]
+      };
+
+      const response = await this.apperClient.fetchRecords(this.tableName, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        return [];
+      }
+
+      return response.data || [];
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error fetching notifications:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      return [];
+    }
   }
 
   async getById(id) {
-    await this.delay();
-    const notification = this.notifications.find(n => n.Id === parseInt(id));
-    return notification ? { ...notification } : null;
+    try {
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "Tags" } },
+          { field: { Name: "type" } },
+          { field: { Name: "targetType" } },
+          { field: { Name: "conversationId" } },
+          { field: { Name: "commentId" } },
+          { field: { Name: "content" } },
+          { field: { Name: "commentText" } },
+          { field: { Name: "timestamp" } },
+          { field: { Name: "read" } },
+          { field: { Name: "createdAt" } },
+          { field: { Name: "actorId" } },
+          { field: { Name: "targetId" } },
+          { field: { Name: "postId" } }
+        ]
+      };
+
+      const response = await this.apperClient.getRecordById(this.tableName, parseInt(id), params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        return null;
+      }
+
+      return response.data;
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error(`Error fetching notification with ID ${id}:`, error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      return null;
+    }
   }
 
   async getByUserId(userId, options = {}) {
-    await this.delay();
-    const { limit = 20, offset = 0, unreadOnly = false } = options;
-    
-    let userNotifications = this.notifications
-      .filter(n => n.targetId === parseInt(userId))
-      .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    try {
+      const { limit = 20, offset = 0, unreadOnly = false } = options;
+      
+      const whereConditions = [
+        {
+          FieldName: "targetId",
+          Operator: "EqualTo",
+          Values: [parseInt(userId)]
+        }
+      ];
 
-    if (unreadOnly) {
-      userNotifications = userNotifications.filter(n => !n.read);
+      if (unreadOnly) {
+        whereConditions.push({
+          FieldName: "read",
+          Operator: "EqualTo",
+          Values: [false]
+        });
+      }
+
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "Tags" } },
+          { field: { Name: "type" } },
+          { field: { Name: "targetType" } },
+          { field: { Name: "conversationId" } },
+          { field: { Name: "commentId" } },
+          { field: { Name: "content" } },
+          { field: { Name: "commentText" } },
+          { field: { Name: "timestamp" } },
+          { field: { Name: "read" } },
+          { field: { Name: "createdAt" } },
+          { field: { Name: "actorId" } },
+          { field: { Name: "targetId" } },
+          { field: { Name: "postId" } }
+        ],
+        where: whereConditions,
+        orderBy: [
+          { fieldName: "timestamp", sorttype: "DESC" }
+        ],
+        pagingInfo: {
+          limit: limit,
+          offset: offset
+        }
+      };
+
+      const response = await this.apperClient.fetchRecords(this.tableName, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        return [];
+      }
+
+      return response.data || [];
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error fetching user notifications:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      return [];
     }
-
-    return userNotifications.slice(offset, offset + limit);
   }
 
   async getGroupedNotifications(userId) {
-    await this.delay();
-    const userNotifications = await this.getByUserId(userId);
-    
-    // Enrich notifications with actor data
-    const enrichedNotifications = await Promise.all(
-      userNotifications.map(async (notification) => {
-        const actor = await userService.getById(notification.actorId);
-        return {
-          ...notification,
-          actor: actor || { displayName: 'Unknown User', profilePicture: null }
-        };
-      })
-    );
+    try {
+      const userNotifications = await this.getByUserId(userId);
+      
+      // Enrich notifications with actor data
+      const enrichedNotifications = await Promise.all(
+        userNotifications.map(async (notification) => {
+          const actor = await userService.getById(notification.actorId?.Id || notification.actorId);
+          return {
+            ...notification,
+            actor: actor || { displayName: 'Unknown User', profilePicture: null }
+          };
+        })
+      );
 
-    // Group by type
-    const grouped = {
-      likes: enrichedNotifications.filter(n => n.type === 'like'),
-      comments: enrichedNotifications.filter(n => n.type === 'comment'),
-      follows: enrichedNotifications.filter(n => n.type === 'follow'),
-      mentions: enrichedNotifications.filter(n => n.type === 'mention'),
-      messages: enrichedNotifications.filter(n => n.type === 'message')
-    };
+      // Group by type
+      const grouped = {
+        likes: enrichedNotifications.filter(n => n.type === 'like'),
+        comments: enrichedNotifications.filter(n => n.type === 'comment'),
+        follows: enrichedNotifications.filter(n => n.type === 'follow'),
+        mentions: enrichedNotifications.filter(n => n.type === 'mention'),
+        messages: enrichedNotifications.filter(n => n.type === 'message')
+      };
 
-    return grouped;
+      return grouped;
+    } catch (error) {
+      console.error("Error fetching grouped notifications:", error);
+      return { likes: [], comments: [], follows: [], mentions: [], messages: [] };
+    }
   }
 
   async markAsRead(id) {
-    await this.delay();
-    const notification = this.notifications.find(n => n.Id === parseInt(id));
-    if (notification) {
-      notification.read = true;
-      return { ...notification };
+    try {
+      const params = {
+        records: [
+          {
+            Id: parseInt(id),
+            read: true
+          }
+        ]
+      };
+
+      const response = await this.apperClient.updateRecord(this.tableName, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        throw new Error(response.message);
+      }
+
+      if (response.results) {
+        const successfulUpdates = response.results.filter(result => result.success);
+        const failedUpdates = response.results.filter(result => !result.success);
+        
+        if (failedUpdates.length > 0) {
+          console.error(`Failed to mark notification as read ${failedUpdates.length} records:${JSON.stringify(failedUpdates)}`);
+          
+          failedUpdates.forEach(record => {
+            record.errors?.forEach(error => {
+              throw new Error(`${error.fieldLabel}: ${error.message}`);
+            });
+            if (record.message) throw new Error(record.message);
+          });
+        }
+        
+        return successfulUpdates[0]?.data;
+      }
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error marking notification as read:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      throw error;
     }
-    throw new Error("Notification not found");
   }
 
   async markAsUnread(id) {
-    await this.delay();
-    const notification = this.notifications.find(n => n.Id === parseInt(id));
-    if (notification) {
-      notification.read = false;
-      return { ...notification };
+    try {
+      const params = {
+        records: [
+          {
+            Id: parseInt(id),
+            read: false
+          }
+        ]
+      };
+
+      const response = await this.apperClient.updateRecord(this.tableName, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        throw new Error(response.message);
+      }
+
+      if (response.results) {
+        const successfulUpdates = response.results.filter(result => result.success);
+        const failedUpdates = response.results.filter(result => !result.success);
+        
+        if (failedUpdates.length > 0) {
+          console.error(`Failed to mark notification as unread ${failedUpdates.length} records:${JSON.stringify(failedUpdates)}`);
+          
+          failedUpdates.forEach(record => {
+            record.errors?.forEach(error => {
+              throw new Error(`${error.fieldLabel}: ${error.message}`);
+            });
+            if (record.message) throw new Error(record.message);
+          });
+        }
+        
+        return successfulUpdates[0]?.data;
+      }
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error marking notification as unread:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      throw error;
     }
-    throw new Error("Notification not found");
   }
 
   async markAllAsRead(userId) {
-    await this.delay();
-    const userNotifications = this.notifications.filter(n => n.targetId === parseInt(userId));
-    userNotifications.forEach(notification => {
-      notification.read = true;
-    });
-    return { success: true, count: userNotifications.length };
+    try {
+      // First get all unread notifications for the user
+      const unreadNotifications = await this.getByUserId(userId, { unreadOnly: true });
+      
+      if (unreadNotifications.length === 0) {
+        return { success: true, count: 0 };
+      }
+
+      const records = unreadNotifications.map(notification => ({
+        Id: notification.Id,
+        read: true
+      }));
+
+      const params = { records };
+
+      const response = await this.apperClient.updateRecord(this.tableName, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        return { success: false, count: 0 };
+      }
+
+      if (response.results) {
+        const successfulUpdates = response.results.filter(result => result.success);
+        const failedUpdates = response.results.filter(result => !result.success);
+        
+        if (failedUpdates.length > 0) {
+          console.error(`Failed to mark all notifications as read ${failedUpdates.length} records:${JSON.stringify(failedUpdates)}`);
+        }
+        
+        return { success: true, count: successfulUpdates.length };
+      }
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error marking all notifications as read:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      return { success: false, count: 0 };
+    }
   }
 
   async markSelectedAsRead(notificationIds) {
-    await this.delay();
-    const updated = [];
-    notificationIds.forEach(id => {
-      const notification = this.notifications.find(n => n.Id === parseInt(id));
-      if (notification) {
-        notification.read = true;
-        updated.push(notification);
+    try {
+      const records = notificationIds.map(id => ({
+        Id: parseInt(id),
+        read: true
+      }));
+
+      const params = { records };
+
+      const response = await this.apperClient.updateRecord(this.tableName, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        return { success: false, count: 0 };
       }
-    });
-    return { success: true, count: updated.length };
+
+      if (response.results) {
+        const successfulUpdates = response.results.filter(result => result.success);
+        const failedUpdates = response.results.filter(result => !result.success);
+        
+        if (failedUpdates.length > 0) {
+          console.error(`Failed to mark selected notifications as read ${failedUpdates.length} records:${JSON.stringify(failedUpdates)}`);
+        }
+        
+        return { success: true, count: successfulUpdates.length };
+      }
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error marking selected notifications as read:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      return { success: false, count: 0 };
+    }
   }
 
   async getUnreadCount(userId) {
-    await this.delay();
-    const unreadNotifications = this.notifications.filter(
-      n => n.targetId === parseInt(userId) && !n.read
-    );
-    return unreadNotifications.length;
+    try {
+      const unreadNotifications = await this.getByUserId(userId, { unreadOnly: true });
+      return unreadNotifications.length;
+    } catch (error) {
+      console.error("Error getting unread count:", error);
+      return 0;
+    }
   }
 
   async delete(id) {
-    await this.delay();
-    const index = this.notifications.findIndex(n => n.Id === parseInt(id));
-    if (index !== -1) {
-      const deleted = this.notifications.splice(index, 1)[0];
-      return deleted;
+    try {
+      const params = {
+        RecordIds: [parseInt(id)]
+      };
+
+      const response = await this.apperClient.deleteRecord(this.tableName, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        throw new Error(response.message);
+      }
+
+      if (response.results) {
+        const successfulDeletions = response.results.filter(result => result.success);
+        const failedDeletions = response.results.filter(result => !result.success);
+        
+        if (failedDeletions.length > 0) {
+          console.error(`Failed to delete notification ${failedDeletions.length} records:${JSON.stringify(failedDeletions)}`);
+          
+          failedDeletions.forEach(record => {
+            if (record.message) throw new Error(record.message);
+          });
+        }
+        
+        return successfulDeletions.length > 0;
+      }
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error deleting notification:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      throw error;
     }
-    throw new Error("Notification not found");
   }
 
   async deleteMultiple(notificationIds) {
-    await this.delay();
-    const deleted = [];
-    notificationIds.forEach(id => {
-      const index = this.notifications.findIndex(n => n.Id === parseInt(id));
-      if (index !== -1) {
-        deleted.push(this.notifications.splice(index, 1)[0]);
+    try {
+      const params = {
+        RecordIds: notificationIds.map(id => parseInt(id))
+      };
+
+      const response = await this.apperClient.deleteRecord(this.tableName, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        return { success: false, count: 0 };
       }
-    });
-    return { success: true, count: deleted.length };
+
+      if (response.results) {
+        const successfulDeletions = response.results.filter(result => result.success);
+        const failedDeletions = response.results.filter(result => !result.success);
+        
+        if (failedDeletions.length > 0) {
+          console.error(`Failed to delete notifications ${failedDeletions.length} records:${JSON.stringify(failedDeletions)}`);
+        }
+        
+        return { success: true, count: successfulDeletions.length };
+      }
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error deleting notifications:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      return { success: false, count: 0 };
+    }
   }
 
   async create(notificationData) {
-    await this.delay();
-    const newNotification = {
-      Id: this.nextId++,
-      ...notificationData,
-      timestamp: new Date().toISOString(),
-      createdAt: new Date().toISOString(),
-      read: false
-    };
-    this.notifications.unshift(newNotification);
-    return { ...newNotification };
+    try {
+      const params = {
+        records: [
+          {
+            Name: notificationData.Name || `${notificationData.type} notification`,
+            Tags: notificationData.Tags || '',
+            type: notificationData.type,
+            targetType: notificationData.targetType,
+            conversationId: notificationData.conversationId || '',
+            commentId: notificationData.commentId || '',
+            content: notificationData.content || '',
+            commentText: notificationData.commentText || '',
+            timestamp: new Date().toISOString(),
+            read: false,
+            createdAt: new Date().toISOString(),
+            actorId: parseInt(notificationData.actorId),
+            targetId: parseInt(notificationData.targetId),
+            postId: notificationData.postId ? parseInt(notificationData.postId) : null
+          }
+        ]
+      };
+
+      const response = await this.apperClient.createRecord(this.tableName, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        throw new Error(response.message);
+      }
+
+      if (response.results) {
+        const successfulRecords = response.results.filter(result => result.success);
+        const failedRecords = response.results.filter(result => !result.success);
+        
+        if (failedRecords.length > 0) {
+          console.error(`Failed to create notification ${failedRecords.length} records:${JSON.stringify(failedRecords)}`);
+          
+          failedRecords.forEach(record => {
+            record.errors?.forEach(error => {
+              throw new Error(`${error.fieldLabel}: ${error.message}`);
+            });
+            if (record.message) throw new Error(record.message);
+          });
+        }
+        
+        return successfulRecords[0]?.data;
+      }
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error creating notification:", error?.response?.data?.message);
+      } else {
+        console.error(error.message);
+      }
+      throw error;
+    }
   }
 
   getNotificationIcon(type) {
@@ -225,7 +568,7 @@ class NotificationService {
       return content.substring(0, 100) + '...';
     }
     
-return content || null;
+    return content || null;
   }
 
   // Real-time notification simulation
@@ -246,6 +589,7 @@ return content || null;
     return this.create(notification);
   }
 }
+
 // Create instance and export
 const notificationService = new NotificationService();
 

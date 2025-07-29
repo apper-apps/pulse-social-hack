@@ -1,12 +1,15 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Outlet } from "react-router-dom";
+import { AuthContext } from "../../App";
 import { toast } from "react-toastify";
-import clipboardService from "@/utils/clipboard";
 import ApperIcon from "@/components/ApperIcon";
 import Sidebar from "@/components/organisms/Sidebar";
+import Button from "@/components/atoms/Button";
+import clipboardService from "@/utils/clipboard";
 
-function Layout() {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+const Layout = () => {
+  const { logout } = useContext(AuthContext);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Demo function to test clipboard functionality
   const handleSharePage = async () => {
@@ -23,7 +26,7 @@ function Layout() {
       console.error('Share error:', error);
       toast.error('Failed to share page', { position: 'top-right' });
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-surface">
@@ -48,7 +51,22 @@ function Layout() {
         </button>
       </div>
 
-<div className="flex">
+      {/* Header with Logout - Desktop */}
+      <header className="hidden lg:block bg-white border-b border-gray-200 px-6 py-4 ml-64">
+        <div className="flex justify-between items-center">
+          <h1 className="text-xl font-semibold text-gray-900">Pulse Social</h1>
+          <Button 
+            onClick={logout}
+            variant="ghost"
+            size="sm"
+            icon="LogOut"
+          >
+            Logout
+          </Button>
+        </div>
+      </header>
+
+      <div className="flex">
         {/* Sidebar */}
         <Sidebar isMobileOpen={isMobileMenuOpen} onMobileClose={() => setIsMobileMenuOpen(false)} />
 
