@@ -1,4 +1,5 @@
 import React from "react";
+import { toast } from "react-toastify";
 import { cn } from "@/utils/cn";
 import ApperIcon from "@/components/ApperIcon";
 
@@ -13,11 +14,38 @@ const PostActions = ({ post, onLike, onComment, onShare }) => {
     onComment?.(post.Id);
   };
 
-  const handleShare = (e) => {
+const handleShare = async (e) => {
     e.stopPropagation();
-    onShare?.(post.Id);
+    
+    try {
+      // Generate shareable URL
+      const shareUrl = `${window.location.origin}/post/${post.Id}`;
+      
+      // Try to copy to clipboard
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(shareUrl);
+      } else {
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = shareUrl;
+        textArea.style.position = 'fixed';
+        textArea.style.opacity = '0';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+      }
+      
+      toast.success('Post link copied to clipboard!');
+      
+      // Call optional callback if provided
+      onShare?.(post.Id);
+    } catch (error) {
+      console.error('Failed to copy link:', error);
+      toast.error('Failed to copy link. Please try again.');
+    }
   };
-
   return (
     <div className="flex items-center space-x-6 pt-4 border-t border-gray-100">
       <button
