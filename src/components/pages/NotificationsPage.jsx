@@ -19,6 +19,8 @@ const NotificationsPage = () => {
   const [showGrouped, setShowGrouped] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [actionLoading, setActionLoading] = useState(false);
+  const [selectedNotificationDetails, setSelectedNotificationDetails] = useState(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
 
   useEffect(() => {
     loadNotifications();
@@ -184,6 +186,16 @@ const NotificationsPage = () => {
     }
   };
 
+const handleNotificationClick = (notification) => {
+    setSelectedNotificationDetails(notification);
+    setShowDetailsModal(true);
+    
+    // Mark as read if unread
+    if (!notification.read) {
+      handleMarkAsRead(notification.Id);
+    }
+  };
+
   const renderNotificationItem = (notification, index) => (
     <motion.div
       key={notification.Id}
@@ -195,7 +207,7 @@ const NotificationsPage = () => {
           ? "bg-white border-gray-200" 
           : "bg-primary-50 border-primary-200"
       } ${selectedNotifications.has(notification.Id) ? 'ring-2 ring-primary-500' : ''}`}
-      onClick={() => !notification.read && handleMarkAsRead(notification.Id)}
+      onClick={() => handleNotificationClick(notification)}
     >
       {/* Selection checkbox */}
       <div className="absolute top-2 right-2">
@@ -276,8 +288,202 @@ const NotificationsPage = () => {
         )}
       </div>
     </motion.div>
-  );
+);
 
+  const renderNotificationDetailsModal = () => {
+    if (!showDetailsModal || !selectedNotificationDetails) return null;
+
+    const notification = selectedNotificationDetails;
+
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+        onClick={() => setShowDetailsModal(false)}
+      >
+        <motion.div
+          initial={{ scale: 0.95, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.95, opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="bg-white rounded-xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Modal Header */}
+          <div className="flex items-center justify-between p-6 border-b border-gray-100">
+            <h2 className="text-xl font-semibold text-gray-900">Notification Details</h2>
+            <button
+              onClick={() => setShowDetailsModal(false)}
+              className="text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <ApperIcon name="X" className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Modal Content */}
+          <div className="p-6 space-y-6">
+            {/* Actor Info */}
+            <div className="flex items-center space-x-4">
+              <Avatar
+                src={notification.actor?.profilePicture}
+                alt={notification.actor?.displayName}
+                size="lg"
+              />
+              <div className="flex-1">
+                <h3 className="font-semibold text-gray-900 text-lg">
+                  {notification.actor?.displayName}
+                </h3>
+                <p className="text-gray-600">@{notification.actor?.username}</p>
+              </div>
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                notification.read ? "bg-gray-100" : "bg-primary-100"
+              }`}>
+                <ApperIcon 
+                  name={notificationService.getNotificationIcon(notification.type)} 
+                  className={`w-5 h-5 ${notificationService.getNotificationColor(notification.type)}`}
+                />
+              </div>
+            </div>
+
+            {/* Notification Message */}
+            <div className="bg-gray-50 rounded-lg p-4">
+              <p className="text-gray-900">
+                <span className="font-semibold">{notification.actor?.displayName}</span>
+                {" "}
+                <span className="text-gray-700">
+                  {notificationService.formatNotificationText(notification)}
+                </span>
+              </p>
+              
+              {/* Content Preview */}
+              {notificationService.getContentPreview(notification) && (
+                <div className="mt-3 p-3 bg-white rounded border-l-4 border-primary-200">
+                  <p className="text-gray-700 italic">
+                    "{notificationService.getContentPreview(notification)}"
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Timestamp and Status */}
+            <div className="flex items-center justify-between text-sm">
+              <div className="text-gray-500">
+                {formatDistanceToNow(new Date(notification.timestamp), { addSuffix: true })}
+              </div>
+              <div className={`flex items-center space-x-2 px-3 py-1 rounded-full ${
+                notification.read 
+                  ? "bg-gray-100 text-gray-600" 
+                  : "bg-primary-100 text-primary-700"
+              }`}>
+                <div className={`w-2 h-2 rounded-full ${
+                  notification.read ? "bg-gray-400" : "bg-primary-500"
+                }`}></div>
+                <span className="font-medium">
+                  {notification.read ? "Read" : "Unread"}
+                </span>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="space-y-3">
+              <div className="flex items-center space-x-3">
+                {/* Mark as read/unread */}
+                {!notification.read ? (
+                  <Button
+                    onClick={() => {
+                      handleMarkAsRead(notification.Id);
+                      setSelectedNotificationDetails({
+                        ...selectedNotificationDetails,
+                        read: true
+                      });
+                    }}
+                    variant="outline"
+                    size="sm"
+                    disabled={actionLoading}
+                    loading={actionLoading}
+                  >
+                    <ApperIcon name="Check" className="w-4 h-4 mr-2" />
+                    Mark as read
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => {
+                      handleMarkAsUnread(notification.Id);
+                      setSelectedNotificationDetails({
+                        ...selectedNotificationDetails,
+                        read: false
+                      });
+                    }}
+                    variant="outline"
+                    size="sm"
+                    disabled={actionLoading}
+                    loading={actionLoading}
+                  >
+                    <ApperIcon name="RotateCcw" className="w-4 h-4 mr-2" />
+                    Mark as unread
+                  </Button>
+                )}
+              </div>
+
+              {/* Navigation Actions */}
+              <div className="space-y-2">
+                {/* View Profile */}
+                <button
+                  onClick={() => {
+                    // Navigate to user profile
+                    window.location.href = `/profile/${notification.actorId}`;
+                  }}
+                  className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <div className="flex items-center space-x-3">
+                    <ApperIcon name="User" className="w-4 h-4 text-gray-600" />
+                    <span className="text-gray-700">View Profile</span>
+                  </div>
+                  <ApperIcon name="ChevronRight" className="w-4 h-4 text-gray-400" />
+                </button>
+
+                {/* View Post (if applicable) */}
+                {notification.postId && (
+                  <button
+                    onClick={() => {
+                      // Navigate to post
+                      window.location.href = `/post/${notification.postId}`;
+                    }}
+                    className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <ApperIcon name="FileText" className="w-4 h-4 text-gray-600" />
+                      <span className="text-gray-700">View Post</span>
+                    </div>
+                    <ApperIcon name="ChevronRight" className="w-4 h-4 text-gray-400" />
+                  </button>
+                )}
+
+                {/* View Conversation (if applicable) */}
+                {notification.conversationId && (
+                  <button
+                    onClick={() => {
+                      // Navigate to messages/conversation
+                      window.location.href = `/messages?conversation=${notification.conversationId}`;
+                    }}
+                    className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <ApperIcon name="MessageSquare" className="w-4 h-4 text-gray-600" />
+                      <span className="text-gray-700">View Conversation</span>
+                    </div>
+                    <ApperIcon name="ChevronRight" className="w-4 h-4 text-gray-400" />
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      </motion.div>
+    );
+  };
   const renderGroupedNotifications = () => {
     const types = [
       { key: 'likes', label: 'Likes', icon: 'Heart', color: 'text-accent-500' },
@@ -437,9 +643,12 @@ return (
             </Button>
           </div>
         )}
-      </motion.div>
-    </div>
-);
+</motion.div>
+
+        {/* Notification Details Modal */}
+        {renderNotificationDetailsModal()}
+      </div>
+    );
 };
 
 export default NotificationsPage;
