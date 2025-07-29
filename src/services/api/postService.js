@@ -254,11 +254,11 @@ class PostService {
     }
   }
 
-  async create(postData) {
+async create(postData) {
     try {
       const currentUser = await userService.getCurrentUser();
       
-      // Handle backward compatibility with imageUrl
+      // Handle backward compatibility with imageUrl and apply length constraints
       let mediaUrls = [];
       if (postData.imageUrl) {
         mediaUrls = [postData.imageUrl];
@@ -268,14 +268,48 @@ class PostService {
         mediaUrls = postData.mediaFiles.map(media => media.preview);
       }
 
+      // Truncate URLs to fit database field constraints (255 char limit)
+      const MAX_FIELD_LENGTH = 250; // Leave some buffer
+      
+      // Truncate imageUrl if too long
+      let imageUrl = null;
+      if (mediaUrls.length > 0) {
+        const firstUrl = mediaUrls[0];
+        imageUrl = firstUrl.length > MAX_FIELD_LENGTH 
+          ? firstUrl.substring(0, MAX_FIELD_LENGTH) 
+          : firstUrl;
+      }
+      
+      // Process mediaUrls to fit within field length constraints
+      let mediaUrlsString = '';
+      const validUrls = [];
+      
+      for (const url of mediaUrls) {
+        const truncatedUrl = url.length > MAX_FIELD_LENGTH 
+          ? url.substring(0, MAX_FIELD_LENGTH) 
+          : url;
+        
+        const testString = validUrls.length === 0 
+          ? truncatedUrl 
+          : validUrls.join(',') + ',' + truncatedUrl;
+        
+        if (testString.length <= MAX_FIELD_LENGTH) {
+          validUrls.push(truncatedUrl);
+        } else {
+          break; // Stop adding URLs if we exceed field length
+        }
+      }
+      
+      mediaUrlsString = validUrls.join(',');
+
       const params = {
         records: [
           {
             Name: postData.Name || `Post by ${currentUser?.displayName || 'User'}`,
             Tags: postData.Tags || '',
             content: postData.content,
-            imageUrl: mediaUrls.length > 0 ? mediaUrls[0] : null,
-            mediaUrls: mediaUrls.join(','),
+            imageUrl: imageUrl,
+            mediaUrls: mediaUrlsString,
             likes: 0,
             isLiked: false,
             comments: 0,
