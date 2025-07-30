@@ -2,7 +2,7 @@ import React from "react";
 import { toast } from "react-toastify";
 import { cn } from "@/utils/cn";
 import ApperIcon from "@/components/ApperIcon";
-
+import { clipboardService } from "@/utils/clipboard";
 const PostActions = ({ post, onLike, onComment, onShare }) => {
   const handleLike = (e) => {
     e.stopPropagation();
@@ -21,23 +21,22 @@ const handleShare = async (e) => {
       // Generate shareable URL
       const shareUrl = `${window.location.origin}/post/${post.Id}`;
       
-      // Try to copy to clipboard
-      if (navigator.clipboard && window.isSecureContext) {
-        await navigator.clipboard.writeText(shareUrl);
-      } else {
-        // Fallback for older browsers
-        const textArea = document.createElement('textarea');
-        textArea.value = shareUrl;
-        textArea.style.position = 'fixed';
-        textArea.style.opacity = '0';
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textArea);
-      }
+      // Use robust clipboard service with comprehensive fallback handling
+      const result = await clipboardService.copyLink(shareUrl, {
+        showToast: false // We'll handle toast notifications ourselves to maintain existing behavior
+      });
       
-      toast.success('Post link copied to clipboard!');
+      if (result.success) {
+        if (result.method === 'text-selection') {
+          toast.info('Link selected. Press Ctrl+C (Cmd+C on Mac) to copy.', {
+            autoClose: 4000
+          });
+        } else {
+          toast.success('Post link copied to clipboard!');
+        }
+      } else {
+        toast.error('Failed to copy link. Please try again.');
+      }
       
       // Call optional callback if provided
       onShare?.(post.Id);
