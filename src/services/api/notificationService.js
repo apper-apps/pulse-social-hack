@@ -653,13 +653,9 @@ async getGroupedNotifications(userId) {
       postId: Math.floor(Math.random() * 10) + 1,
       read: false
     };
-
-    return this.create(notification);
+return this.create(notification);
   }
 }
-
-}
-
 // Create instance and export
 const notificationService = new NotificationService();
 
