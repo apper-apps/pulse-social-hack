@@ -194,13 +194,9 @@ async getGroupedNotifications(userId) {
       console.error("Error fetching grouped notifications:", error);
       return { likes: [], comments: [], follows: [], mentions: [], messages: [] };
     }
-  }
-
-
-
 }
-  }
-async getById(id) {
+
+  async getById(id) {
     try {
       const params = {
         fields: [
@@ -237,9 +233,9 @@ async getById(id) {
       }
       return null;
     }
-  }
 }
-async markAsRead(id) {
+
+  async markAsRead(id) {
     try {
       const params = {
         records: [
@@ -285,8 +281,9 @@ async markAsRead(id) {
       }
       throw error;
     }
-  }
-async markAsUnread(id) {
+}
+
+  async markAsUnread(id) {
     try {
       const params = {
         records: [
@@ -332,8 +329,9 @@ async markAsUnread(id) {
       }
       throw error;
     }
-  }
-async markAllAsRead(userId) {
+}
+
+  async markAllAsRead(userId) {
     try {
       // First get all unread notifications for the user
       const unreadNotifications = await this.getByUserId(userId, { unreadOnly: true });
@@ -414,8 +412,9 @@ async markAllAsRead(userId) {
       }
       return { success: false, count: 0 };
     }
-  }
-async getUnreadCount(userId) {
+}
+
+  async getUnreadCount(userId) {
     try {
       const unreadNotifications = await this.getByUserId(userId, { unreadOnly: true });
       return unreadNotifications.length;
@@ -467,8 +466,9 @@ async getUnreadCount(userId) {
       }
       throw error;
     }
-  }
-async deleteMultiple(notificationIds) {
+}
+
+  async deleteMultiple(notificationIds) {
     try {
       if (!notificationIds || notificationIds.length === 0) {
         return { success: true, count: 0 };
@@ -560,8 +560,9 @@ async deleteMultiple(notificationIds) {
       }
       throw error;
     }
-  }
-getNotificationIcon(type) {
+}
+
+  getNotificationIcon(type) {
     switch (type) {
       case "like":
         return "Heart";
@@ -593,8 +594,9 @@ getNotificationIcon(type) {
       default:
         return "text-gray-500";
     }
-  }
-formatNotificationText(notification) {
+}
+
+  formatNotificationText(notification) {
     const { type, actor, content, commentText } = notification;
     
     switch (type) {
@@ -656,10 +658,6 @@ formatNotificationText(notification) {
   }
 }
 
-// Create instance and export
-const notificationService = new NotificationService();
-
-export default notificationService;
 }
 
 // Create instance and export
