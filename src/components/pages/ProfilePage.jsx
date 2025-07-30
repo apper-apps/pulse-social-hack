@@ -34,11 +34,19 @@ const loadProfileData = async () => {
       setLoading(true);
       setError("");
       
-// Ensure userId is a valid primitive value - handle various object formats
-// userId from useParams() is always a string, validate and convert to number
-      const stringId = String(userId).trim();
+// Ensure userId is a valid value - handle various formats including objects
+// Extract ID if object is passed, similar to userService.js pattern
+      let extractedId;
+      if (typeof userId === 'object' && userId !== null) {
+        extractedId = userId.Id || userId.id || userId.ID;
+      } else {
+        extractedId = userId;
+      }
+      
+      // Convert to string and validate
+      const stringId = String(extractedId).trim();
       if (!stringId || stringId === 'undefined' || stringId === 'null') {
-        console.error(`Invalid user ID provided: ${userId}`);
+        console.error(`Invalid user ID provided: ${typeof userId === 'object' ? JSON.stringify(userId) : userId}`);
         setError("Invalid user ID provided");
         setLoading(false);
         return;
