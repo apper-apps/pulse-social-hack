@@ -35,19 +35,10 @@ const loadProfileData = async () => {
       setError("");
       
 // Ensure userId is a valid primitive value - handle various object formats
-      let idValue = userId;
-      
-      // Extract ID from object if necessary (handle lookup objects and nested structures)
-      if (typeof userId === 'object' && userId !== null) {
-        idValue = userId.Id || userId.id || userId.ID || 
-                  (userId.data && (userId.data.Id || userId.data.id)) ||
-                  (userId.value && (userId.value.Id || userId.value.id));
-      }
-      
-      // Convert to string and validate format
-      const stringId = String(idValue).trim();
-      if (!stringId || stringId === 'undefined' || stringId === 'null' || stringId === '[object Object]') {
-        console.error(`Invalid user ID format provided: ${typeof userId === 'object' ? JSON.stringify(userId) : userId}`);
+// userId from useParams() is always a string, validate and convert to number
+      const stringId = String(userId).trim();
+      if (!stringId || stringId === 'undefined' || stringId === 'null') {
+        console.error(`Invalid user ID provided: ${userId}`);
         setError("Invalid user ID provided");
         setLoading(false);
         return;
@@ -62,16 +53,14 @@ const loadProfileData = async () => {
         return;
       }
       
-      idValue = numericId;
-      
       const [userData, userPosts, currentUserData] = await Promise.all([
-        userService.getById(idValue),
-        postService.getByUserId(idValue),
+        userService.getById(numericId),
+        postService.getByUserId(numericId),
         userService.getCurrentUser()
       ]);
       
       // Get updated user data with current follow counts
-      const updatedUserData = await userService.getById(idValue);
+      const updatedUserData = await userService.getById(numericId);
       
       setUser(updatedUserData);
       setPosts(userPosts);
