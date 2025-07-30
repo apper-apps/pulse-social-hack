@@ -16,12 +16,17 @@ constructor() {
     this.tableName = 'app_Notification';
   }
 
-  async getAll() {
+async getAll() {
     try {
       const params = {
         fields: [
           { field: { Name: "Name" } },
           { field: { Name: "Tags" } },
+          { field: { Name: "Owner" } },
+          { field: { Name: "CreatedOn" } },
+          { field: { Name: "CreatedBy" } },
+          { field: { Name: "ModifiedOn" } },
+          { field: { Name: "ModifiedBy" } },
           { field: { Name: "type" } },
           { field: { Name: "targetType" } },
           { field: { Name: "conversationId" } },
@@ -36,68 +41,41 @@ constructor() {
           { field: { Name: "postId" } }
         ],
         orderBy: [
-          { fieldName: "timestamp", sorttype: "DESC" }
-        ]
+          {
+            fieldName: "timestamp",
+            sorttype: "DESC"
+          }
+        ],
+        pagingInfo: {
+          limit: 50,
+          offset: 0
+        }
       };
 
       const response = await this.apperClient.fetchRecords(this.tableName, params);
-      
+
       if (!response.success) {
         console.error(response.message);
+        throw new Error(response.message);
+      }
+
+      if (!response.data || response.data.length === 0) {
         return [];
-      }
-
-      return response.data || [];
-    } catch (error) {
-if (error?.response?.data?.message) {
-        console.error("Error fetching notifications:", error?.response?.data?.message);
-      } else {
-        console.error("Error fetching notifications:", error.message);
-      }
-      return [];
-    }
-  }
-
-  async getById(id) {
-    try {
-      const params = {
-        fields: [
-          { field: { Name: "Name" } },
-          { field: { Name: "Tags" } },
-          { field: { Name: "type" } },
-          { field: { Name: "targetType" } },
-          { field: { Name: "conversationId" } },
-          { field: { Name: "commentId" } },
-          { field: { Name: "content" } },
-          { field: { Name: "commentText" } },
-          { field: { Name: "timestamp" } },
-          { field: { Name: "read" } },
-          { field: { Name: "createdAt" } },
-          { field: { Name: "actorId" } },
-          { field: { Name: "targetId" } },
-          { field: { Name: "postId" } }
-        ]
-      };
-
-      const response = await this.apperClient.getRecordById(this.tableName, parseInt(id), params);
-      
-      if (!response.success) {
-        console.error(response.message);
-        return null;
       }
 
       return response.data;
     } catch (error) {
       if (error?.response?.data?.message) {
-        console.error(`Error fetching notification with ID ${id}:`, error?.response?.data?.message);
-} else {
-        console.error("Error fetching notification by ID:", error.message);
+        console.error("Error fetching notifications:", error?.response?.data?.message);
+        throw new Error(error?.response?.data?.message);
+      } else {
+        console.error("Error fetching notifications:", error.message);
+        throw new Error(error.message);
       }
-      return null;
     }
   }
 
-  async getByUserId(userId, options = {}) {
+async getByUserId(userId, options = {}) {
     try {
       const { limit = 20, offset = 0, unreadOnly = false } = options;
       
@@ -121,6 +99,11 @@ if (error?.response?.data?.message) {
         fields: [
           { field: { Name: "Name" } },
           { field: { Name: "Tags" } },
+          { field: { Name: "Owner" } },
+          { field: { Name: "CreatedOn" } },
+          { field: { Name: "CreatedBy" } },
+          { field: { Name: "ModifiedOn" } },
+          { field: { Name: "ModifiedBy" } },
           { field: { Name: "type" } },
           { field: { Name: "targetType" } },
           { field: { Name: "conversationId" } },
@@ -136,7 +119,10 @@ if (error?.response?.data?.message) {
         ],
         where: whereConditions,
         orderBy: [
-          { fieldName: "timestamp", sorttype: "DESC" }
+          {
+            fieldName: "timestamp",
+            sorttype: "DESC"
+          }
         ],
         pagingInfo: {
           limit: limit,
@@ -145,7 +131,7 @@ if (error?.response?.data?.message) {
       };
 
       const response = await this.apperClient.fetchRecords(this.tableName, params);
-      
+
       if (!response.success) {
         console.error(response.message);
         return [];
@@ -153,7 +139,7 @@ if (error?.response?.data?.message) {
 
       return response.data || [];
     } catch (error) {
-if (error?.response?.data?.message) {
+      if (error?.response?.data?.message) {
         console.error("Error fetching user notifications:", error?.response?.data?.message);
       } else {
         console.error("Error fetching user notifications:", error.message);
@@ -162,14 +148,13 @@ if (error?.response?.data?.message) {
     }
   }
 
-
-  async getGroupedNotifications(userId) {
+async getGroupedNotifications(userId) {
     try {
       const userNotifications = await this.getByUserId(userId);
       
       // Enrich notifications with actor data
       const enrichedNotifications = await Promise.all(
-userNotifications.map(async (notification) => {
+        userNotifications.map(async (notification) => {
           let actor = null;
           
           // Validate actor ID before attempting to fetch
@@ -206,14 +191,55 @@ userNotifications.map(async (notification) => {
 
       return grouped;
     } catch (error) {
-console.error("Error fetching grouped notifications:", error);
+      console.error("Error fetching grouped notifications:", error);
       return { likes: [], comments: [], follows: [], mentions: [], messages: [] };
     }
   }
 
 
 
-  async markAsRead(id) {
+}
+  }
+async getById(id) {
+    try {
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "Tags" } },
+          { field: { Name: "type" } },
+          { field: { Name: "targetType" } },
+          { field: { Name: "conversationId" } },
+          { field: { Name: "commentId" } },
+          { field: { Name: "content" } },
+          { field: { Name: "commentText" } },
+          { field: { Name: "timestamp" } },
+          { field: { Name: "read" } },
+          { field: { Name: "createdAt" } },
+          { field: { Name: "actorId" } },
+          { field: { Name: "targetId" } },
+          { field: { Name: "postId" } }
+        ]
+      };
+
+      const response = await this.apperClient.getRecordById(this.tableName, parseInt(id), params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        return null;
+      }
+
+      return response.data;
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error(`Error fetching notification with ID ${id}:`, error?.response?.data?.message);
+      } else {
+        console.error("Error fetching notification by ID:", error.message);
+      }
+      return null;
+    }
+  }
+}
+async markAsRead(id) {
     try {
       const params = {
         records: [
@@ -225,7 +251,7 @@ console.error("Error fetching grouped notifications:", error);
       };
 
       const response = await this.apperClient.updateRecord(this.tableName, params);
-if (!response.success) {
+      if (!response.success) {
         if (response.message && response.message.toLowerCase().includes('record does not exist')) {
           console.error(`Notification with ID ${id} not found in database`);
         } else {
@@ -260,8 +286,7 @@ if (!response.success) {
       throw error;
     }
   }
-
-  async markAsUnread(id) {
+async markAsUnread(id) {
     try {
       const params = {
         records: [
@@ -273,7 +298,7 @@ if (!response.success) {
       };
 
       const response = await this.apperClient.updateRecord(this.tableName, params);
-if (!response.success) {
+      if (!response.success) {
         if (response.message && response.message.toLowerCase().includes('record does not exist')) {
           console.error(`Notification with ID ${id} not found for mark as unread operation`);
         } else {
@@ -308,8 +333,7 @@ if (!response.success) {
       throw error;
     }
   }
-
-  async markAllAsRead(userId) {
+async markAllAsRead(userId) {
     try {
       // First get all unread notifications for the user
       const unreadNotifications = await this.getByUserId(userId, { unreadOnly: true });
@@ -347,13 +371,12 @@ if (!response.success) {
         console.error("Error marking all notifications as read:", error?.response?.data?.message);
       } else {
         console.error(error.message);
-}
+      }
       return { success: false, count: 0 };
     }
   }
 
-
-async markSelectedAsRead(notificationIds) {
+  async markSelectedAsRead(notificationIds) {
     try {
       if (!notificationIds || notificationIds.length === 0) {
         return { success: true, count: 0 };
@@ -392,8 +415,6 @@ async markSelectedAsRead(notificationIds) {
       return { success: false, count: 0 };
     }
   }
-
-
 async getUnreadCount(userId) {
     try {
       const unreadNotifications = await this.getByUserId(userId, { unreadOnly: true });
@@ -417,7 +438,7 @@ async getUnreadCount(userId) {
       const response = await this.apperClient.deleteRecord(this.tableName, params);
       
       if (!response.success) {
-if (response.message && response.message.toLowerCase().includes('record does not exist')) {
+        if (response.message && response.message.toLowerCase().includes('record does not exist')) {
           console.error(`Notification with ID ${id} not found for deletion`);
         } else {
           console.error(`Database error deleting notification ${id}:`, response.message);
@@ -447,7 +468,6 @@ if (response.message && response.message.toLowerCase().includes('record does not
       throw error;
     }
   }
-
 async deleteMultiple(notificationIds) {
     try {
       if (!notificationIds || notificationIds.length === 0) {
@@ -484,7 +504,6 @@ async deleteMultiple(notificationIds) {
       return { success: false, count: 0 };
     }
   }
-
 
   async create(notificationData) {
     try {
@@ -542,8 +561,7 @@ async deleteMultiple(notificationIds) {
       throw error;
     }
   }
-
-  getNotificationIcon(type) {
+getNotificationIcon(type) {
     switch (type) {
       case "like":
         return "Heart";
@@ -576,8 +594,7 @@ async deleteMultiple(notificationIds) {
         return "text-gray-500";
     }
   }
-
-  formatNotificationText(notification) {
+formatNotificationText(notification) {
     const { type, actor, content, commentText } = notification;
     
     switch (type) {
@@ -637,6 +654,12 @@ async deleteMultiple(notificationIds) {
 
     return this.create(notification);
   }
+}
+
+// Create instance and export
+const notificationService = new NotificationService();
+
+export default notificationService;
 }
 
 // Create instance and export
