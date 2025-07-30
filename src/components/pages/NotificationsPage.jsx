@@ -187,6 +187,12 @@ const NotificationsPage = () => {
   };
 
 const handleNotificationClick = (notification) => {
+    // Validate notification has required data
+    if (!notification || !notification.Id) {
+      console.error("Invalid notification object:", notification);
+      return;
+    }
+    
     setSelectedNotificationDetails(notification);
     setShowDetailsModal(true);
     

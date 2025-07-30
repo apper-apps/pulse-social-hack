@@ -12,17 +12,36 @@ const PostCard = ({ post, onLike }) => {
   const [author, setAuthor] = useState(null);
   const [isLiking, setIsLiking] = useState(false);
 
-  React.useEffect(() => {
+React.useEffect(() => {
     const fetchAuthor = async () => {
       try {
-        const userData = await userService.getById(post.authorId);
+        // Extract ID from authorId - handle lookup objects
+        let authorIdValue = post.authorId;
+        
+        // Handle lookup object format from database
+        if (typeof post.authorId === 'object' && post.authorId !== null) {
+          authorIdValue = post.authorId.Id || post.authorId.id || post.authorId;
+        }
+        
+        // Validate the ID before making the request
+        if (!authorIdValue || String(authorIdValue).trim() === '' || String(authorIdValue) === '[object Object]') {
+          console.error("Invalid author ID provided for post:", post.Id);
+          setAuthor(null);
+          return;
+        }
+        
+        const userData = await userService.getById(authorIdValue);
         setAuthor(userData);
       } catch (error) {
-        console.error("Failed to fetch author:", error);
+        console.error("Failed to fetch author for post:", post.Id, error);
+        setAuthor(null);
       }
     };
-    fetchAuthor();
-  }, [post.authorId]);
+    
+    if (post.authorId) {
+      fetchAuthor();
+    }
+  }, [post.authorId, post.Id]);
 
   const handleLike = async (postId) => {
     if (isLiking) return;

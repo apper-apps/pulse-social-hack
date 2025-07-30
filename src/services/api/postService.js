@@ -373,10 +373,14 @@ class PostService {
           }
         ]
       };
-
-      const response = await this.apperClient.updateRecord(this.tableName, params);
+const response = await this.apperClient.updateRecord(this.tableName, params);
       
       if (!response.success) {
+        if (response.message && response.message.toLowerCase().includes('record does not exist')) {
+          console.error(`Post with ID ${id} not found for like toggle operation`);
+        } else {
+          console.error(`Database error toggling like for post ${id}:`, response.message);
+        }
         console.error(response.message);
         throw new Error(response.message);
       }
@@ -415,9 +419,12 @@ class PostService {
       };
 
       const response = await this.apperClient.deleteRecord(this.tableName, params);
-      
-      if (!response.success) {
-        console.error(response.message);
+if (!response.success) {
+        if (response.message && response.message.toLowerCase().includes('record does not exist')) {
+          console.error(`Post with ID ${id} not found for deletion`);
+        } else {
+          console.error(`Database error deleting post ${id}:`, response.message);
+        }
         throw new Error(response.message);
       }
 
@@ -465,8 +472,12 @@ class PostService {
 
       const response = await this.apperClient.updateRecord(this.tableName, params);
       
-      if (!response.success) {
-        console.error(response.message);
+if (!response.success) {
+        if (response.message && response.message.toLowerCase().includes('record does not exist')) {
+          console.error(`Post with ID ${postId} not found for adding comment`);
+        } else {
+          console.error(`Database error adding comment to post ${postId}:`, response.message);
+        }
         throw new Error(response.message);
       }
 
@@ -515,10 +526,14 @@ class PostService {
         ]
       };
 
-      const response = await this.apperClient.updateRecord(this.tableName, params);
+const response = await this.apperClient.updateRecord(this.tableName, params);
       
       if (!response.success) {
-        console.error(response.message);
+        if (response.message && response.message.toLowerCase().includes('record does not exist')) {
+          console.error(`Post with ID ${postId} not found for removing comment`);
+        } else {
+          console.error(`Database error removing comment from post ${postId}:`, response.message);
+        }
         throw new Error(response.message);
       }
 

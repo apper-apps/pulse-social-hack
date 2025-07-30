@@ -30,15 +30,33 @@ useEffect(() => {
       setLoading(true);
       setError("");
       
-      const postData = await postService.getById(postId);
-      if (!postData) {
-        setError("Post not found");
+      // Validate postId before making request
+      if (!postId || String(postId).trim() === '') {
+        setError("Invalid post ID");
+        setLoading(false);
         return;
       }
       
-      const authorData = await userService.getById(postData.authorId);
+      const postData = await postService.getById(postId);
+      if (!postData) {
+        setError("Post not found");
+        setLoading(false);
+        return;
+      }
       
-      // For demo purposes, use the author as current user
+      // Extract author ID properly - handle lookup objects
+      let authorIdValue = postData.authorId;
+      if (typeof postData.authorId === 'object' && postData.authorId !== null) {
+        authorIdValue = postData.authorId.Id || postData.authorId.id || postData.authorId;
+      }
+      
+      const authorData = await userService.getById(authorIdValue);
+      if (!authorData) {
+        console.warn(`Author with ID ${authorIdValue} not found for post ${postId}`);
+        // Continue without author data rather than failing completely
+      }
+      
+      // For demo purposes, use the first user as current user
       // In a real app, this would come from auth context
       const userData = await userService.getById(1);
       
@@ -48,7 +66,11 @@ useEffect(() => {
       
     } catch (err) {
       console.error("Failed to load post:", err);
-      setError("Failed to load post. Please try again.");
+      if (err.message && err.message.toLowerCase().includes('record does not exist')) {
+        setError("Post not found");
+      } else {
+        setError("Failed to load post. Please try again.");
+      }
     } finally {
       setLoading(false);
     }

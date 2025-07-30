@@ -39,16 +39,30 @@ const loadProfileData = async () => {
       
       // Extract ID from object if necessary (handle lookup objects and nested structures)
       if (typeof userId === 'object' && userId !== null) {
-        idValue = userId.Id || userId.id || userId.ID || (userId.data && (userId.data.Id || userId.data.id));
+        idValue = userId.Id || userId.id || userId.ID || 
+                  (userId.data && (userId.data.Id || userId.data.id)) ||
+                  (userId.value && (userId.value.Id || userId.value.id));
       }
       
-      // Convert to string and validate
-      idValue = String(idValue).trim();
-      if (!idValue || idValue === 'undefined' || idValue === 'null' || idValue === '[object Object]') {
+      // Convert to string and validate format
+      const stringId = String(idValue).trim();
+      if (!stringId || stringId === 'undefined' || stringId === 'null' || stringId === '[object Object]') {
+        console.error(`Invalid user ID format provided: ${typeof userId === 'object' ? JSON.stringify(userId) : userId}`);
         setError("Invalid user ID provided");
         setLoading(false);
         return;
       }
+      
+      // Validate ID as numeric
+      const numericId = parseInt(stringId);
+      if (isNaN(numericId) || numericId <= 0) {
+        console.error(`Invalid user ID value provided: ${stringId} (parsed as: ${numericId})`);
+        setError("Invalid user ID format");
+        setLoading(false);
+        return;
+      }
+      
+      idValue = numericId;
       
       const [userData, userPosts, currentUserData] = await Promise.all([
         userService.getById(idValue),

@@ -225,9 +225,12 @@ console.error("Error fetching grouped notifications:", error);
       };
 
       const response = await this.apperClient.updateRecord(this.tableName, params);
-      
-      if (!response.success) {
-        console.error(response.message);
+if (!response.success) {
+        if (response.message && response.message.toLowerCase().includes('record does not exist')) {
+          console.error(`Notification with ID ${id} not found in database`);
+        } else {
+          console.error(`Database error for notification ID ${id}:`, response.message);
+        }
         throw new Error(response.message);
       }
 
@@ -270,9 +273,12 @@ console.error("Error fetching grouped notifications:", error);
       };
 
       const response = await this.apperClient.updateRecord(this.tableName, params);
-      
-      if (!response.success) {
-        console.error(response.message);
+if (!response.success) {
+        if (response.message && response.message.toLowerCase().includes('record does not exist')) {
+          console.error(`Notification with ID ${id} not found for mark as unread operation`);
+        } else {
+          console.error(`Database error marking notification ${id} as unread:`, response.message);
+        }
         throw new Error(response.message);
       }
 
@@ -411,10 +417,13 @@ async getUnreadCount(userId) {
       const response = await this.apperClient.deleteRecord(this.tableName, params);
       
       if (!response.success) {
-        console.error(response.message);
+if (response.message && response.message.toLowerCase().includes('record does not exist')) {
+          console.error(`Notification with ID ${id} not found for deletion`);
+        } else {
+          console.error(`Database error deleting notification ${id}:`, response.message);
+        }
         throw new Error(response.message);
       }
-
       if (response.results) {
         const successfulDeletions = response.results.filter(result => result.success);
         const failedDeletions = response.results.filter(result => !result.success);
